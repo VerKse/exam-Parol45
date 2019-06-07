@@ -8,7 +8,7 @@ using System.Net.Sockets;
 
 namespace ChatServer
 {
-    class Main
+    class Program
     {
         static ServerEngine server = new ServerEngine();
         static void Main(string[] args)
