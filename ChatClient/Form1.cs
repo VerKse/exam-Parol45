@@ -21,7 +21,9 @@ namespace ChatClient
         public MainWindow()
         {
             InitializeComponent();
-            Connect();
+            messageBox.AppendText("Это гамно хотя бы запустилось");
+            Task task = new Task(Connect);
+            task.Start();
         }
 
         private void SendMessage(object sender, KeyPressEventArgs e)
@@ -31,15 +33,23 @@ namespace ChatClient
                 try
                 {
                     if (client == null || stream == null)
-                        Connect();
-                    byte[] data = Encoding.Unicode.GetBytes(inputField.Text);
-                    stream.Write(data, 0, data.Length);
+                    {
+                        Task task = new Task(Connect);
+                        task.Start();
+                    }
+                    else
+                    {
+                        byte[] data = Encoding.Unicode.GetBytes(inputField.Text);
+                        stream.Write(data, 0, data.Length);
+                        inputField.Text = "";
+                    }
                     e.Handled = true;
-                    inputField.Text = "";
                 }
                 catch (Exception ex)
                 {
-                    messageBox.AppendText(ex.Message + "\n");
+                    messageBox.AppendText("\n" + ex.Message);
+                    messageBox.SelectionStart = messageBox.Text.Length - 1;
+                    messageBox.ScrollToCaret();
                 }
             }
         }
@@ -50,12 +60,20 @@ namespace ChatClient
             {
                 client = new TcpClient(host, 1488);
                 stream = client.GetStream();
-                Task task = new Task(GetNewMessages);
-                task.Start();
+                if (client != null && stream != null)
+                {
+                    messageBox.BeginInvoke(new Action(() => messageBox.AppendText("\nДобро пожаловать в чат, введите свой ник")));
+                    messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
+                    messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
+                    Task task = new Task(GetNewMessages);
+                    task.Start();
+                }
             }
             catch (Exception e)
             {
-                messageBox.AppendText(e.Message + "\n");
+                messageBox.BeginInvoke(new Action<string>((s) => messageBox.AppendText(s)), "\n" + e.Message);
+                messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
+                messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
             }
         }
 
@@ -73,16 +91,25 @@ namespace ChatClient
                     {
                         bytes = stream.Read(data, 0, data.Length);
                         builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+                        if (bytes == 0)
+                        {
+                            Disconnect();
+                            return;
+                        }
                     }
                     while (stream.DataAvailable);
 
                     message = builder.ToString();
                     builder.Clear();
-                    messageBox.BeginInvoke(new Action<string>((s) => messageBox.AppendText(s)), message + "\n");
+                    messageBox.BeginInvoke(new Action<string>((s) => messageBox.AppendText(s)), "\n" + message);
+                    messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
+                    messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
                 }
                 catch (Exception e)
                 {
-                    messageBox.BeginInvoke(new Action<string>((s) => messageBox.AppendText(s)), e.Message + "\n");
+                    messageBox.BeginInvoke(new Action<string>((s) => messageBox.AppendText(s)), "\n" + e.Message);
+                    messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
+                    messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
                     Disconnect();
                 }
             }
