@@ -30,15 +30,15 @@
         {
             this.mainTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.chatroomList = new System.Windows.Forms.ListBox();
-            this.TableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.messageBox = new System.Windows.Forms.RichTextBox();
-            this.inputField = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.onlineUsersList = new System.Windows.Forms.TextBox();
             this.onlineList = new System.Windows.Forms.ListBox();
+            this.inputField = new System.Windows.Forms.TextBox();
+            this.TableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.mainTableLayout.SuspendLayout();
-            this.TableLayout.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            this.TableLayout.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainTableLayout
@@ -63,6 +63,7 @@
             // 
             this.chatroomList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chatroomList.FormattingEnabled = true;
+            this.chatroomList.IntegralHeight = false;
             this.chatroomList.Items.AddRange(new object[] {
             "Room 1",
             "Room 2",
@@ -72,43 +73,6 @@
             this.chatroomList.Name = "chatroomList";
             this.chatroomList.Size = new System.Drawing.Size(129, 486);
             this.chatroomList.TabIndex = 7;
-            // 
-            // TableLayout
-            // 
-            this.TableLayout.ColumnCount = 1;
-            this.TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TableLayout.Controls.Add(this.messageBox, 0, 0);
-            this.TableLayout.Controls.Add(this.inputField, 0, 1);
-            this.TableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayout.Location = new System.Drawing.Point(139, 0);
-            this.TableLayout.Margin = new System.Windows.Forms.Padding(0);
-            this.TableLayout.Name = "TableLayout";
-            this.TableLayout.RowCount = 2;
-            this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.TableLayout.Size = new System.Drawing.Size(540, 496);
-            this.TableLayout.TabIndex = 0;
-            // 
-            // messageBox
-            // 
-            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.messageBox.Location = new System.Drawing.Point(5, 5);
-            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
-            this.messageBox.Name = "messageBox";
-            this.messageBox.ReadOnly = true;
-            this.messageBox.Size = new System.Drawing.Size(530, 456);
-            this.messageBox.TabIndex = 6;
-            this.messageBox.Text = "";
-            // 
-            // inputField
-            // 
-            this.inputField.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.inputField.Location = new System.Drawing.Point(5, 471);
-            this.inputField.Margin = new System.Windows.Forms.Padding(5);
-            this.inputField.Name = "inputField";
-            this.inputField.Size = new System.Drawing.Size(530, 20);
-            this.inputField.TabIndex = 5;
-            this.inputField.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendMessage);
             // 
             // tableLayoutPanel2
             // 
@@ -136,11 +100,13 @@
             this.onlineUsersList.Size = new System.Drawing.Size(130, 20);
             this.onlineUsersList.TabIndex = 9;
             this.onlineUsersList.Text = "Users online:";
+            this.onlineUsersList.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // onlineList
             // 
             this.onlineList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.onlineList.FormattingEnabled = true;
+            this.onlineList.IntegralHeight = false;
             this.onlineList.Items.AddRange(new object[] {
             "You"});
             this.onlineList.Location = new System.Drawing.Point(5, 35);
@@ -148,6 +114,43 @@
             this.onlineList.Name = "onlineList";
             this.onlineList.Size = new System.Drawing.Size(130, 456);
             this.onlineList.TabIndex = 8;
+            // 
+            // inputField
+            // 
+            this.inputField.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.inputField.Location = new System.Drawing.Point(5, 471);
+            this.inputField.Margin = new System.Windows.Forms.Padding(5);
+            this.inputField.Name = "inputField";
+            this.inputField.Size = new System.Drawing.Size(530, 20);
+            this.inputField.TabIndex = 5;
+            this.inputField.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendMessage);
+            // 
+            // TableLayout
+            // 
+            this.TableLayout.ColumnCount = 1;
+            this.TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TableLayout.Controls.Add(this.inputField, 0, 1);
+            this.TableLayout.Controls.Add(this.messageBox, 0, 0);
+            this.TableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TableLayout.Location = new System.Drawing.Point(139, 0);
+            this.TableLayout.Margin = new System.Windows.Forms.Padding(0);
+            this.TableLayout.Name = "TableLayout";
+            this.TableLayout.RowCount = 2;
+            this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.TableLayout.Size = new System.Drawing.Size(540, 496);
+            this.TableLayout.TabIndex = 0;
+            // 
+            // messageBox
+            // 
+            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.messageBox.Location = new System.Drawing.Point(5, 5);
+            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
+            this.messageBox.Name = "messageBox";
+            this.messageBox.ReadOnly = true;
+            this.messageBox.Size = new System.Drawing.Size(530, 456);
+            this.messageBox.TabIndex = 6;
+            this.messageBox.Text = "";
             // 
             // MainWindow
             // 
@@ -158,10 +161,10 @@
             this.Name = "MainWindow";
             this.Text = "IRC";
             this.mainTableLayout.ResumeLayout(false);
-            this.TableLayout.ResumeLayout(false);
-            this.TableLayout.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
+            this.TableLayout.ResumeLayout(false);
+            this.TableLayout.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -169,13 +172,13 @@
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel mainTableLayout;
-        private System.Windows.Forms.TableLayoutPanel TableLayout;
         private System.Windows.Forms.TextBox onlineUsersList;
-        private System.Windows.Forms.TextBox inputField;
-        private System.Windows.Forms.RichTextBox messageBox;
         private System.Windows.Forms.ListBox chatroomList;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.ListBox onlineList;
+        private System.Windows.Forms.TableLayoutPanel TableLayout;
+        private System.Windows.Forms.TextBox inputField;
+        private lib.RichTextBoxEx messageBox;
     }
 }
 

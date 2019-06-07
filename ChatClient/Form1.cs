@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
+using ChatClient.lib;
+using static ChatClient.lib.Routines;
 
 namespace ChatClient
 {
@@ -39,17 +38,14 @@ namespace ChatClient
                     }
                     else
                     {
-                        byte[] data = Encoding.Unicode.GetBytes(inputField.Text);
-                        stream.Write(data, 0, data.Length);
+                        sendToStream(inputField.Text, stream);
                         inputField.Text = "";
                     }
                     e.Handled = true;
                 }
                 catch (Exception ex)
                 {
-                    messageBox.AppendText("\n" + ex.Message);
-                    messageBox.SelectionStart = messageBox.Text.Length - 1;
-                    messageBox.ScrollToCaret();
+                    printToMessageBox("In SendMessage(): " + ex.Message, messageBox);
                 }
             }
         }
@@ -62,54 +58,35 @@ namespace ChatClient
                 stream = client.GetStream();
                 if (client != null && stream != null)
                 {
-                    messageBox.BeginInvoke(new Action(() => messageBox.AppendText("\nДобро пожаловать в чат, введите свой ник")));
-                    messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
-                    messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
+                    printToMessageBox("Добро пожаловать в чат, введите свой ник", messageBox);
                     Task task = new Task(GetNewMessages);
                     task.Start();
                 }
             }
             catch (Exception e)
             {
-                messageBox.BeginInvoke(new Action<string>((s) => messageBox.AppendText(s)), "\n" + e.Message);
-                messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
-                messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
+                printToMessageBox("In Connect(): " + e.Message, messageBox);
             }
         }
 
         private void GetNewMessages()
         {
-            StringBuilder builder = new StringBuilder();
-            byte[] data = new byte[64];
-            int bytes = 0;
             string message;
             while (true)
             {
                 try
                 {
-                    do
+                    message = getFromStream(stream);
+                    if (message == null)
                     {
-                        bytes = stream.Read(data, 0, data.Length);
-                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                        if (bytes == 0)
-                        {
-                            Disconnect();
-                            return;
-                        }
+                        Disconnect();
+                        return;
                     }
-                    while (stream.DataAvailable);
-
-                    message = builder.ToString();
-                    builder.Clear();
-                    messageBox.BeginInvoke(new Action<string>((s) => messageBox.AppendText(s)), "\n" + message);
-                    messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
-                    messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
+                    printToMessageBox(message, messageBox);
                 }
                 catch (Exception e)
                 {
-                    messageBox.BeginInvoke(new Action<string>((s) => messageBox.AppendText(s)), "\n" + e.Message);
-                    messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
-                    messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
+                    printToMessageBox("In GetNewMessages(): " + e.Message, messageBox);
                     Disconnect();
                 }
             }
@@ -122,7 +99,6 @@ namespace ChatClient
                 stream.Close();
             if (client != null)
                 client.Close();
-            Environment.Exit(0);
         }
     }
 }
