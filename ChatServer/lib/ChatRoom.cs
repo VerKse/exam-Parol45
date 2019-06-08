@@ -8,7 +8,7 @@ using System.Net.Sockets;
 
 namespace ChatServer.lib
 {
-    class ServerEngine
+    class ChatRoom
     {
         List<ClientClass> clients = new List<ClientClass>();
         TcpListener listener;
@@ -34,9 +34,9 @@ namespace ChatServer.lib
                 listener.Start();
                 while (true)
                 {
-                    Console.WriteLine("Ожидание подключений... ");
+                    Console.WriteLine("Waiting for connections... ");
                     TcpClient client = listener.AcceptTcpClient();
-                    Console.WriteLine("Кто-то подключился");
+                    Console.WriteLine("Somebody connected");
                     AddNewClient(new ClientClass(client, this));
                 }
             }
@@ -50,9 +50,10 @@ namespace ChatServer.lib
             byte[] data = Encoding.Unicode.GetBytes(message);
             for (int i = 0; i < clients.Count; i++)
             {
-                Console.WriteLine("Sending to " + clients[i].Id);
+                Console.Write(clients[i].Id + ", ");
                 clients[i].Stream.Write(data, 0, data.Length);
             }
+            Console.WriteLine();
         }
     }
 }

@@ -12,9 +12,9 @@ namespace ChatServer.lib
     {
         protected internal string Id { get; private set; }
         TcpClient Client;
-        ServerEngine Server;
+        ChatRoom Server;
         public NetworkStream Stream;
-        public ClientClass(TcpClient client, ServerEngine server)
+        public ClientClass(TcpClient client, ChatRoom server)
         {
             this.Client = client;
             this.Server = server;

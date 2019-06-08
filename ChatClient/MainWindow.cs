@@ -20,7 +20,7 @@ namespace ChatClient
         public MainWindow()
         {
             InitializeComponent();
-            messageBox.AppendText("Это гамно хотя бы запустилось");
+            messageBox.AppendText("Это гамно хотя бы запустилось.");
             Task task = new Task(Connect);
             task.Start();
         }
@@ -38,7 +38,7 @@ namespace ChatClient
                     }
                     else
                     {
-                        sendToStream(inputField.Text, stream);
+                        sendToStream(inputField.Text, ref stream);
                         inputField.Text = "";
                     }
                     e.Handled = true;
@@ -58,7 +58,7 @@ namespace ChatClient
                 stream = client.GetStream();
                 if (client != null && stream != null)
                 {
-                    printToMessageBox("Добро пожаловать в чат, введите свой ник", messageBox);
+                    printToMessageBox("Добро пожаловать в чат, введите свой ник.", messageBox);
                     Task task = new Task(GetNewMessages);
                     task.Start();
                 }
@@ -76,7 +76,7 @@ namespace ChatClient
             {
                 try
                 {
-                    message = getFromStream(stream);
+                    message = getFromStream(ref stream);
                     if (message == null)
                     {
                         Disconnect();

@@ -14,27 +14,23 @@ namespace ChatClient.lib
             messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
             messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
         }
-        public static void sendToStream(string message, NetworkStream stream)
+        public static void sendToStream(string message, ref NetworkStream stream)
         {
             byte[] data = Encoding.Unicode.GetBytes(message);
             stream.Write(data, 0, data.Length);
         }
-        public static string getFromStream(NetworkStream stream)
+        public static string getFromStream(ref NetworkStream stream)
         {
             StringBuilder builder = new StringBuilder();
             byte[] data = new byte[64];
             int bytes = 0;
-            string message;
+            string message = "";
             do
             {
                 bytes = stream.Read(data, 0, data.Length);
                 builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                if (bytes == 0)
-                {
-                    return null;
-                }
 
-                message = builder.ToString();
+                message += builder.ToString();
                 builder.Clear();
             }
             while (stream.DataAvailable);
