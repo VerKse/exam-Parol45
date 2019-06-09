@@ -1,6 +1,6 @@
 ﻿namespace ChatClient
 {
-    partial class MainWindow
+    partial class IRC
     {
         /// <summary>
         /// Required designer variable.
@@ -86,7 +86,7 @@
             this.inputField.Name = "inputField";
             this.inputField.Size = new System.Drawing.Size(530, 20);
             this.inputField.TabIndex = 5;
-            this.inputField.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendMessage);
+            this.inputField.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendChatMessage);
             // 
             // messageBox
             // 
@@ -97,6 +97,7 @@
             this.messageBox.ReadOnly = true;
             this.messageBox.Size = new System.Drawing.Size(530, 456);
             this.messageBox.TabIndex = 6;
+            this.messageBox.TabStop = false;
             this.messageBox.Text = "";
             // 
             // tableLayoutPanel2
@@ -182,14 +183,17 @@
             this.chatroomsLabel.Text = "Chatrooms:";
             this.chatroomsLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // MainWindow
+            // IRC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(819, 496);
             this.Controls.Add(this.mainTableLayout);
-            this.Name = "MainWindow";
+            this.IsMdiContainer = true;
+            this.Name = "IRC";
             this.Text = "IRC";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.IRC_FormClosing);
+            this.Load += new System.EventHandler(this.onIrcLoad);
             this.mainTableLayout.ResumeLayout(false);
             this.TableLayout.ResumeLayout(false);
             this.TableLayout.PerformLayout();
@@ -208,11 +212,11 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.ListBox onlineUsersList;
         private System.Windows.Forms.TableLayoutPanel TableLayout;
-        private System.Windows.Forms.TextBox inputField;
         private lib.RichTextBoxEx messageBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ListBox chatroomList;
         private System.Windows.Forms.TextBox chatroomsLabel;
+        public System.Windows.Forms.TextBox inputField;
     }
 }
 

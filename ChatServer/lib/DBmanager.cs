@@ -38,7 +38,7 @@ namespace ChatServer.lib
                 for (int i = 0; i < chatRooms.Count; i++)
                 {
                     initializator.CommandText =
-                        "create table if not exists `" + chatRooms[i] + "_hist`(message nvarchar(1000), id int not null primary key auto_increment);";
+                        "create table if not exists `" + chatRooms[i] + "_hist`(message nvarchar(1000) not null, dt datetime(6) not null primary key);";
                     initializator.ExecuteNonQuery();
                     Console.Write(chatRooms[i] + (i == chatRooms.Count ? ", " : ""));
                 }
@@ -49,7 +49,7 @@ namespace ChatServer.lib
                 selection.Close();
                 initializator.CommandText = "insert into rooms(name) values('Фаны Валакаса');";
                 initializator.ExecuteNonQuery();
-                initializator.CommandText = "create table if not exists `Фаны Валакаса_hist`(message nvarchar(1000), id int not null primary key auto_increment);";
+                initializator.CommandText = "create table if not exists `Фаны Валакаса_hist`(message nvarchar(1000) not null, dt datetime(6) not null primary key);";
                 initializator.ExecuteNonQuery();
                 Console.WriteLine("There are no rooms. Inserted default one and created hist table for it.");
             }
