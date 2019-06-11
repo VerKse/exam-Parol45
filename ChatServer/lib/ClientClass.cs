@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Sockets;
 using ChatLib;
 using static ChatLib.Interactions;
@@ -10,9 +11,9 @@ namespace ChatServer.lib
         protected internal int id { get; private set; }
         protected internal string name { get; private set; }
         TcpClient Client;
-        ChatRoomClass Server;
+        ServerEngine Server;
         public NetworkStream Stream;
-        public ClientClass(TcpClient client, ChatRoomClass server, int id)
+        public ClientClass(TcpClient client, ServerEngine server, int id)
         {
             Client = client;
             Server = server;
@@ -31,9 +32,22 @@ namespace ChatServer.lib
                     switch (message.code)
                     {
                         case codes.SENDING_USERNAME:
-                            name = message.info;
-                            Server.UpdateAll(name + " has connected.");
-                            Console.WriteLine(name + " has connected.");
+                            if (Server.connectedUsers.FirstOrDefault(c => c.name == message.info) == null)
+                            {
+                                name = message.info;
+                                sendToStream(new Message(codes.CONFIRMING_USERNAME, name), ref Stream);
+                                Server.UpdateAll(name + " has connected.");
+                                Console.WriteLine(name + " has connected.");
+                            }
+                            else
+                            {
+                                sendToStream(new Message(codes.REQUESTING_USERNAME, 
+                                    "There is user witn nickname \"" + message.info + "\" in this room already"), ref Stream);
+                                Console.WriteLine("There is user witn nickname " + name + " already");
+                            }
+                            break;
+                        case codes.REQUESTING_ROOMLIST:
+                            sendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList()), ref Stream);
                             break;
                         case codes.SENDING_CHAT_MESSAGE:
                             Server.UpdateAll(name + ": " + message.info);

@@ -9,10 +9,11 @@ namespace ChatServer.lib
 {
     static class DBmanager
     {
+        static MySqlConnection connection;
         const string host = "46.173.214.207"; // поменять на localhost
         const string user = "client"; // поменять на root 
         const string password = "12345a";
-        public static void Initialize(ref MySqlConnection connection)
+        public static void Initialize()
         {
             string Connect = "Datasource=" + host + ";User=" + user + ";Password=" + password + ";charset=utf8";
             connection = new MySqlConnection(Connect);
@@ -24,7 +25,7 @@ namespace ChatServer.lib
             initializator.CommandText = "create table if not exists rooms(name nvarchar(50) not null primary key);";
             initializator.ExecuteNonQuery();
             Console.WriteLine("Table rooms is created.");
-            initializator.CommandText = "select * from rooms;";
+            initializator.CommandText = "select name from rooms;";
             MySqlDataReader selection = initializator.ExecuteReader();
             if (selection.HasRows)
             {
@@ -40,7 +41,7 @@ namespace ChatServer.lib
                     initializator.CommandText =
                         "create table if not exists `" + chatRooms[i] + "_hist`(message nvarchar(1000) not null, dt datetime(6) not null primary key);";
                     initializator.ExecuteNonQuery();
-                    Console.Write(chatRooms[i] + (i == chatRooms.Count ? ", " : ""));
+                    Console.Write(chatRooms[i] + (i == chatRooms.Count - 1 ? "" : ", "));
                 }
                 Console.WriteLine(".");
             }
@@ -53,6 +54,26 @@ namespace ChatServer.lib
                 initializator.ExecuteNonQuery();
                 Console.WriteLine("There are no rooms. Inserted default one and created hist table for it.");
             }
+        }
+        public static List<string> GetRoomList()
+        {
+            List<string> result = new List<string>();
+            MySqlCommand query = connection.CreateCommand();
+            query.CommandText = "select name from rooms;";
+            MySqlDataReader roomlist = query.ExecuteReader();
+            if (roomlist.HasRows)
+            {
+                while (roomlist.Read())
+                {
+                    result.Add(roomlist.GetString(0));
+                }
+                roomlist.Close();
+            }
+            return result;
+        }
+        public static void CloseConnection()
+        {
+            connection.Close();
         }
     }
 }

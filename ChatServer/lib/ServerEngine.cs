@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
@@ -10,14 +9,14 @@ using static ChatLib.Interactions;
 
 namespace ChatServer.lib
 {
-    class ChatRoomClass
+    class ServerEngine
     {
         int idForNextUser = 0;
         string name;
-        List<ClientClass> connectedUsers = new List<ClientClass>();
+        public List<ClientClass> connectedUsers = new List<ClientClass>();
         TcpListener listener;
 
-        public ChatRoomClass(string name = "")
+        public ServerEngine(string name = "")
         {
             this.name = name;
         }
@@ -26,8 +25,7 @@ namespace ChatServer.lib
         {
             connectedUsers.Add(client);
             Console.WriteLine("Successfully added client to collection. There are " + connectedUsers.Count + " connected users.");
-            Task task = new Task(client.Process);
-            task.Start();
+            Task.Run(() => client.Process());
         }
         // Удаление из коллекции пользователя с заданным id (Да, из-за постоянных переподключений он за границы выйти может).
         protected internal void RemoveClient(int id)

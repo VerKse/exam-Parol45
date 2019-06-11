@@ -8,19 +8,18 @@ namespace ChatServer
 {
     class Program
     {
-        static ChatRoomClass server = new ChatRoomClass("Фаны Валакаса");
-        static MySqlConnection mysql_connection;
+        static ServerEngine server = new ServerEngine("Фаны Валакаса");
 
         static void Main(string[] args)
         {
             try
             {
-                Console.WriteLine("ver 0.0.5");
+                Console.WriteLine("ver 0.0.6");
                 // Подключаемся и создаём объекты в бд.
-                DBmanager.Initialize(ref mysql_connection);
+                DBmanager.Initialize();
                 // Ждём пользователей.
                 server.Listen();
-                mysql_connection.Close();
+                DBmanager.CloseConnection();
             }
             catch (Exception e)
             {

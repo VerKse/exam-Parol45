@@ -12,11 +12,13 @@ namespace ChatLib
         public Interactions.codes code { get; private set; }
         public string info { get; private set; }
         public DateTime timestamp { get; private set; }
-        public Message(Interactions.codes code, string info = "", DateTime timestamp = new DateTime())
+        public List<string> list { get; private set; }
+        public Message(Interactions.codes code, string info = "", DateTime timestamp = new DateTime(), List<string> list = null)
         {
             this.code = code;
             this.info = info;
             this.timestamp = timestamp;
+            this.list = list;
         }
     }
 }
