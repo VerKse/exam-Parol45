@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 using ChatLib;
 using static ChatLib.Interactions;
 namespace ChatServer.lib
@@ -10,6 +11,7 @@ namespace ChatServer.lib
     {
         public string name;
         public List<ClientClass> connectedUsers = new List<ClientClass>();
+        protected internal MySqlConnection connection = DBmanager.Connect();
         public Room(string name)
         {
             this.name = name;
@@ -20,8 +22,8 @@ namespace ChatServer.lib
             connectedUsers.Add(client);
             Console.WriteLine("Successfully added client " + client.name + " to " + this.name +
                 " room. There are " + connectedUsers.Count + " connected users.");
-            SendToStream(new Message(codes.SENDING_USERLIST, list: connectedUsers.Select(u => u.name).ToList()),
-                ref client.stream);
+            SendToStream(new Message(codes.SENDING_CHAT_INFO,
+                list: connectedUsers.Select(u => u.name).ToList(), list2: DBmanager.GetHistory(name, client.connection)), ref client.client);
             Task.Run(() => SendBroadcastMessage(client.name + " joined the room."));
         }
         protected internal void RemoveClient(int id)
@@ -34,14 +36,14 @@ namespace ChatServer.lib
         }
         public void SendBroadcastMessage(string message)
         {
-            Task.Run(() => DBmanager.SaveMessage(message, name));
+            DBmanager.SaveMessage(message, name, connection);
             Console.Write("Broadcasting for: ");
             for (int i = 0; i < connectedUsers.Count; i++)
             {
-                Console.Write(connectedUsers[i].name + (i + 1 == connectedUsers.Count ? "." : ", "));
-                SendToStream(new Message(codes.SENDING_BROADCAST_MESSAGE, message), ref connectedUsers[i].stream);
+                Console.Write(connectedUsers[i].name + (i + 1 == connectedUsers.Count ? "" : ", "));
+                SendToStream(new Message(codes.SENDING_BROADCAST_MESSAGE, message), ref connectedUsers[i].client);
             }
-            Console.WriteLine();
+            Console.WriteLine(".");
         }
     }
 }

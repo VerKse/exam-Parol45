@@ -8,13 +8,11 @@ namespace ChatServer
 
         static void Main(string[] args)
         {
-            Console.WriteLine("ver 0.1.1");
-            // Подключаемся и создаём объекты в бд.
+            Console.WriteLine("ver 0.1.2");
+            // Создаём возможно отсутствующие объекты в бд.
             DBmanager.Initialize();
             // Ждём пользователей в бесконечном цикле.
             ServerEngine.Listen();
-            // Отключаемся от бд.
-            DBmanager.CloseConnection();
         }
     }
 }

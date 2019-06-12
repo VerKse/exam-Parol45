@@ -9,14 +9,13 @@ namespace ChatServer.lib
 {
     static class DBmanager
     {
-        static MySqlConnection connection;
         const string host = "46.173.214.207"; // поменять на localhost
         const string user = "client"; // поменять на root 
         const string password = "12345a";
+        public static string connectionString = "Datasource=" + host + ";User=" + user + ";Password=" + password + ";charset=utf8";
         public static void Initialize()
         {
-            string Connect = "Datasource=" + host + ";User=" + user + ";Password=" + password + ";charset=utf8";
-            connection = new MySqlConnection(Connect);
+            MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
             MySqlCommand initializator = connection.CreateCommand();
             initializator.CommandText = "create database if not exists Chat; use Chat;";
@@ -55,8 +54,9 @@ namespace ChatServer.lib
                 initializator.ExecuteNonQuery();
                 Console.WriteLine("There are no rooms. Inserted default one and created hist table for it.");
             }
+            connection.Close();
         }
-        public static List<string> GetRoomList()
+        public static List<string> GetRoomList(MySqlConnection connection)
         {
             List<string> result = new List<string>();
             MySqlCommand query = connection.CreateCommand();
@@ -67,14 +67,13 @@ namespace ChatServer.lib
             roomlist.Close();
             return result;
         }
-        // Изменить сигнатуру для собственного соединения у клиента
-        public static void SaveMessage(string message, string roomName)
+        public static void SaveMessage(string message, string roomName, MySqlConnection connection)
         {
             MySqlCommand query = connection.CreateCommand();
             query.CommandText = "insert into `" + roomName + "_hist`(message, dt) values('" + message.Replace("'", "\'") + "', sysdate());";
             query.ExecuteNonQuery();
         }
-        public static List<string> GetHistory(string roomName)
+        public static List<string> GetHistory(string roomName, MySqlConnection connection)
         {
             List<string> hist = new List<string>();
             MySqlCommand query = connection.CreateCommand();
@@ -85,9 +84,14 @@ namespace ChatServer.lib
             selection.Close();
             return hist;
         }
-        public static void CloseConnection()
+        public static MySqlConnection Connect()
         {
-            connection.Close();
+            MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+            MySqlCommand query = connection.CreateCommand();
+            query.CommandText = "use Chat;";
+            query.ExecuteNonQuery();
+            return connection;
         }
     }
 }

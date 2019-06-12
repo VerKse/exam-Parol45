@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Sockets;
+using MySql.Data.MySqlClient;
 using ChatLib;
 using static ChatLib.Interactions;
 
@@ -10,11 +11,13 @@ namespace ChatServer.lib
     {
         protected internal int id { get; private set; }
         protected internal string name { get; private set; }
-        TcpClient client;
+        public TcpClient client;
         public NetworkStream stream;
         public Room room;
-        public ClientClass(ref TcpClient client, string name, int id)
+        protected internal MySqlConnection connection { get; private set; }
+        public ClientClass(ref MySqlConnection connection, ref TcpClient client, string name, int id)
         {
+            this.connection = connection;
             this.client = client;
             this.name = name;
             this.id = id;
@@ -28,19 +31,13 @@ namespace ChatServer.lib
                 Message message;
                 while (true)
                 {
-                    message = GetFromStream(ref stream);
+                    message = GetFromStream(ref client);
                     switch (message.code)
                     {
                         case codes.REQUESTING_ROOMLIST:
-                            SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList()), ref stream);
+                            SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection)), ref client);
                             break;
-                        case codes.REQUESTING_USERLIST:
-                            SendToStream(new Message(codes.SENDING_USERLIST,
-                                list: room.connectedUsers.Select(u => u.name).ToList()), ref stream);
-                            break;
-                        case codes.REQUESTING_MESSAGE_HISTORY:
-                            SendToStream(new Message(codes.SENDING_MESSAGE_HISTORY, list: DBmanager.GetHistory(room.name)), ref stream);
-                            break;
+                        // case codes.REQUESTING_CHAT_INFO:
                         case codes.SENDING_CHAT_MESSAGE:
                             room.SendBroadcastMessage(name + ": " + message.info);
                             Console.WriteLine(name + ": " + message.info);
@@ -49,6 +46,7 @@ namespace ChatServer.lib
                             ServerEngine.ChangeRoom(this, message.info);
                             break;
                         case codes.SENDING_DISCONNECT_MESSAGE:
+                            connection.Close();
                             Disconnect();
                             ServerEngine.existingNicknames.Remove(name);
                             room.RemoveClient(id);
@@ -65,9 +63,9 @@ namespace ChatServer.lib
                 Console.WriteLine("In Process(): " + e.Message);
                 ServerEngine.existingNicknames.Remove(name);
                 Console.WriteLine(name + " left the room.");
-                room.SendBroadcastMessage(name + " left the room.");
-                Disconnect();
                 room.RemoveClient(id);
+                connection.Close();
+                Disconnect();
             }
         }
         // Закрытие объектов, отвечающих за подключение.
