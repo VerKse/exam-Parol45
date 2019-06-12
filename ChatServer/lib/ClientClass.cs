@@ -37,9 +37,8 @@ namespace ChatServer.lib
                         case codes.REQUESTING_ROOMLIST:
                             SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection)), ref client);
                             break;
-                        // case codes.REQUESTING_CHAT_INFO:
                         case codes.SENDING_CHAT_MESSAGE:
-                            room.SendBroadcastMessage(name + ": " + message.info);
+                            room.SendBroadcastMessage(name + ": " + message.info, connection);
                             Console.WriteLine(name + ": " + message.info);
                             break;
                         case codes.SENDING_SELECTED_ROOM:
@@ -54,7 +53,6 @@ namespace ChatServer.lib
                         default:
                             Console.WriteLine("Wrong message code with package body: " + message.info + ".");
                             break;
-                        // TODO: добавить обработку остальных кодов.
                     }
                 }
             }
