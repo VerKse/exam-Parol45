@@ -20,7 +20,7 @@ namespace ChatServer.lib
             connectedUsers.Add(client);
             Console.WriteLine("Successfully added client " + client.name + " to " + this.name +
                 " room. There are " + connectedUsers.Count + " connected users.");
-            SendToStream(new Message(codes.SENDING_USERLIST, list: connectedUsers.Select(u => u.name).Distinct().ToList()),
+            SendToStream(new Message(codes.SENDING_USERLIST, list: connectedUsers.Select(u => u.name).ToList()),
                 ref client.stream);
             Task.Run(() => SendBroadcastMessage(client.name + " joined the room."));
         }
@@ -34,6 +34,7 @@ namespace ChatServer.lib
         }
         public void SendBroadcastMessage(string message)
         {
+            Task.Run(() => DBmanager.SaveMessage(message, name));
             Console.Write("Broadcasting for: ");
             for (int i = 0; i < connectedUsers.Count; i++)
             {
@@ -41,7 +42,6 @@ namespace ChatServer.lib
                 SendToStream(new Message(codes.SENDING_BROADCAST_MESSAGE, message), ref connectedUsers[i].stream);
             }
             Console.WriteLine();
-            // TODO: сохранение в историю сообщений.
         }
     }
 }

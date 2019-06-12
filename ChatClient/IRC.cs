@@ -23,6 +23,24 @@ namespace ChatClient
             messageBox.AppendText("Ah shit, here we go again.");
             Task.Run(() => Connect());
         }
+        private void Connect()
+        {
+            try
+            {
+                client = new TcpClient(host, 1488);
+                stream = client.GetStream();
+                if (client != null && stream != null)
+                {
+                    PrintToMessageBox("Connected to server. Please enter your nickname.", messageBox);
+                    SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref stream);
+                    Task.Run(() => GetNewMessages());
+                }
+            }
+            catch (Exception e)
+            {
+                PrintToMessageBox("In Connect(): " + e.Message, messageBox);
+            }
+        }
         private void SendChatMessage(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter && inputField.Text.Trim(' ').Length > 0)
@@ -53,26 +71,6 @@ namespace ChatClient
                 }
             }
         }
-
-        private void Connect()
-        {
-            try
-            {
-                client = new TcpClient(host, 1488);
-                stream = client.GetStream();
-                if (client != null && stream != null)
-                {
-                    PrintToMessageBox("Connected to server. Please enter your nickname.", messageBox);
-                    SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref stream);
-                    Task.Run(() => GetNewMessages());
-                }
-            }
-            catch (Exception e)
-            {
-                PrintToMessageBox("In Connect(): " + e.Message, messageBox);
-            }
-        }
-
         private void GetNewMessages()
         {
             ChatLib.Message message;
@@ -114,9 +112,11 @@ namespace ChatClient
                                 resultUserlist = onlineUsersList.BeginInvoke(new Action(() => onlineUsersList.Items.Add(message.list[i])));
                                 onlineUsersList.EndInvoke(resultUserlist);
                             }
+                            SendToStream(new ChatLib.Message(codes.REQUESTING_MESSAGE_HISTORY), ref stream);
                             break;
                         case codes.SENDING_MESSAGE_HISTORY:
-                            messageBox.BeginInvoke(new Action (() => messageBox.Text = message.info));
+                            messageBox.BeginInvoke(new Action (() => messageBox.Text = ""));
+                            message.list.ForEach(l => PrintToMessageBox(l, messageBox));
                             break;
                     }
                 }
@@ -128,19 +128,20 @@ namespace ChatClient
                 Disconnect();
             }
         }
+        private void ChooseRoom(object sender, EventArgs e)
+        {
+            if (chatroomList.SelectedItem != null)
+            {
+                SendToStream(new ChatLib.Message(codes.SENDING_SELECTED_ROOM, chatroomList.SelectedItem.ToString()), ref stream);
+                SendToStream(new ChatLib.Message(codes.SENDING_SELECTED_ROOM, chatroomList.SelectedItem.ToString()), ref stream);
+            }
+        }
         static void Disconnect()
         {
             if (stream != null)
                 stream.Close();
             if (client != null)
                 client.Close();
-        }
-        private void ChooseRoom(object sender, EventArgs e)
-        {
-            if (chatroomList.SelectedItem != null)
-            {
-                SendToStream(new ChatLib.Message(codes.SENDING_SELECTED_ROOM, chatroomList.SelectedItem.ToString()), ref stream);
-            }
         }
         private void IRC_FormClosing(object sender, FormClosingEventArgs e)
         {

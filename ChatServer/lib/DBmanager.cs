@@ -62,15 +62,28 @@ namespace ChatServer.lib
             MySqlCommand query = connection.CreateCommand();
             query.CommandText = "select name from rooms;";
             MySqlDataReader roomlist = query.ExecuteReader();
-            if (roomlist.HasRows)
-            {
-                while (roomlist.Read())
-                {
-                    result.Add(roomlist.GetString(0));
-                }
-                roomlist.Close();
-            }
+            while (roomlist.Read())
+                result.Add(roomlist.GetString(0));
+            roomlist.Close();
             return result;
+        }
+        // Изменить сигнатуру для собственного соединения у клиента
+        public static void SaveMessage(string message, string roomName)
+        {
+            MySqlCommand query = connection.CreateCommand();
+            query.CommandText = "insert into `" + roomName + "_hist`(message, dt) values('" + message.Replace("'", "\'") + "', sysdate());";
+            query.ExecuteNonQuery();
+        }
+        public static List<string> GetHistory(string roomName)
+        {
+            List<string> hist = new List<string>();
+            MySqlCommand query = connection.CreateCommand();
+            query.CommandText = "select message from `" + roomName + "_hist` order by dt;";
+            MySqlDataReader selection = query.ExecuteReader();
+            while (selection.Read())
+                hist.Add(selection.GetString(0));
+            selection.Close();
+            return hist;
         }
         public static void CloseConnection()
         {

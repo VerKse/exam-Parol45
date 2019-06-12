@@ -34,6 +34,13 @@ namespace ChatServer.lib
                         case codes.REQUESTING_ROOMLIST:
                             SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList()), ref stream);
                             break;
+                        case codes.REQUESTING_USERLIST:
+                            SendToStream(new Message(codes.SENDING_USERLIST,
+                                list: room.connectedUsers.Select(u => u.name).ToList()), ref stream);
+                            break;
+                        case codes.REQUESTING_MESSAGE_HISTORY:
+                            SendToStream(new Message(codes.SENDING_MESSAGE_HISTORY, list: DBmanager.GetHistory(room.name)), ref stream);
+                            break;
                         case codes.SENDING_CHAT_MESSAGE:
                             room.SendBroadcastMessage(name + ": " + message.info);
                             Console.WriteLine(name + ": " + message.info);
@@ -56,6 +63,9 @@ namespace ChatServer.lib
             catch (Exception e)
             {
                 Console.WriteLine("In Process(): " + e.Message);
+                ServerEngine.existingNicknames.Remove(name);
+                Console.WriteLine(name + " left the room.");
+                room.SendBroadcastMessage(name + " left the room.");
                 Disconnect();
                 room.RemoveClient(id);
             }

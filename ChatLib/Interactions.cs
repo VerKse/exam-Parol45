@@ -30,7 +30,7 @@ namespace ChatLib
             if (stream != null && stream.CanWrite)
                 stream.Write(data, 0, data.Length);
         }
-        // Получение сообщения из потока и его расшифровка из jsona в объект класса Message. (Стрим должен быть живой)
+        // Получение сообщения из потока и его расшифровка из jsona в объект класса Message (Стрим должен быть живой).
         public static Message GetFromStream(ref NetworkStream stream)
         {
             StringBuilder builder = new StringBuilder();
@@ -42,6 +42,7 @@ namespace ChatLib
                 builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
             }
             while (stream.DataAvailable);
+
             return JsonConvert.DeserializeObject<Message>(builder.ToString());
         }
     }
