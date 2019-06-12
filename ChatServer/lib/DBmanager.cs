@@ -42,6 +42,7 @@ namespace ChatServer.lib
                         "create table if not exists `" + chatRooms[i] + "_hist`(message nvarchar(1000) not null, dt datetime(6) not null primary key);";
                     initializator.ExecuteNonQuery();
                     Console.Write(chatRooms[i] + (i == chatRooms.Count - 1 ? "" : ", "));
+                    ServerEngine.rooms.Add(new Room(chatRooms[i]));
                 }
                 Console.WriteLine(".");
             }

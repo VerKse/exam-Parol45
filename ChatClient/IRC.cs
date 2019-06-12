@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
@@ -11,9 +10,8 @@ namespace ChatClient
     public partial class IRC : Form
     {
         private const string host = "46.173.214.207";
-        static NetworkStream stream;
         static TcpClient client;
-        public string username;
+        static NetworkStream stream;
         codes lastServReqest = codes.REQUESTING_USERNAME;
         public IRC()
         {
@@ -32,20 +30,17 @@ namespace ChatClient
                 try
                 {
                     if (client == null || stream == null || !client.Connected || !stream.CanWrite)
-                    {
-                        Task task = new Task(Connect);
-                        task.Start();
-                    }
+                        Task.Run(() => Connect());
                     else
                     {
                         switch (lastServReqest)
                         {
                             case codes.REQUESTING_USERNAME:
-                                sendToStream(new ChatLib.Message(codes.SENDING_USERNAME, inputField.Text.Trim(' ')), ref stream);
+                                SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, inputField.Text.Trim(' ')), ref stream);
                                 lastServReqest = codes.SENDING_USERNAME;
                                 break;
                             default:
-                                sendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, inputField.Text.Trim(' ')), ref stream);
+                                SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, inputField.Text.Trim(' ')), ref stream);
                                 break;
                         }
                         inputField.Text = "";
@@ -68,9 +63,8 @@ namespace ChatClient
                 if (client != null && stream != null)
                 {
                     PrintToMessageBox("Connected to server. Please enter your nickname.", messageBox);
-                    sendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref stream);
-                    Task task = new Task(GetNewMessages);
-                    task.Start();
+                    SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref stream);
+                    Task.Run(() => GetNewMessages());
                 }
             }
             catch (Exception e)
@@ -88,7 +82,7 @@ namespace ChatClient
                 {
                     if (stream == null || !stream.CanRead)
                         break;
-                    message = getFromStream(ref stream);
+                    message = GetFromStream(ref stream);
                     switch (message.code)
                     {
                         case codes.SENDING_BROADCAST_MESSAGE:
@@ -97,20 +91,32 @@ namespace ChatClient
                         case codes.CONFIRMING_USERNAME:
                             BeginInvoke(new Action(() => Text = message.info + " - " + Text));
                             chatroomList.BeginInvoke(new Action(() => chatroomList.Enabled = true));
-                            onlineUsersList.BeginInvoke(new Action(() => onlineUsersList.Items.Add("Choose room.")));
+                            PrintToMessageBox("You logged in as " + message.info, messageBox);
                             break;
                         case codes.REQUESTING_USERNAME:
                             PrintToMessageBox(message.info, messageBox);
                             lastServReqest = codes.REQUESTING_USERNAME;
                             break;
                         case codes.SENDING_ROOMLIST:
-                            IAsyncResult resultObj = chatroomList.BeginInvoke(new Action(() => chatroomList.Items.Clear()));
-                            chatroomList.EndInvoke(resultObj);
+                            IAsyncResult resultChatroom = chatroomList.BeginInvoke(new Action(() => chatroomList.Items.Clear()));
+                            chatroomList.EndInvoke(resultChatroom);
                             for (int i = 0; i < message.list.Count; i++)
                             {
-                                resultObj = chatroomList.BeginInvoke(new Action(() => chatroomList.Items.Add(message.list[i])));
-                                chatroomList.EndInvoke(resultObj);
+                                resultChatroom = chatroomList.BeginInvoke(new Action(() => chatroomList.Items.Add(message.list[i])));
+                                chatroomList.EndInvoke(resultChatroom);
                             }
+                            break;
+                        case codes.SENDING_USERLIST:
+                            IAsyncResult resultUserlist = onlineUsersList.BeginInvoke(new Action(() => onlineUsersList.Items.Clear()));
+                            onlineUsersList.EndInvoke(resultUserlist);
+                            for (int i = 0; i < message.list.Count; i++)
+                            {
+                                resultUserlist = onlineUsersList.BeginInvoke(new Action(() => onlineUsersList.Items.Add(message.list[i])));
+                                onlineUsersList.EndInvoke(resultUserlist);
+                            }
+                            break;
+                        case codes.SENDING_MESSAGE_HISTORY:
+                            messageBox.BeginInvoke(new Action (() => messageBox.Text = message.info));
                             break;
                     }
                 }
@@ -129,23 +135,16 @@ namespace ChatClient
             if (client != null)
                 client.Close();
         }
-
-        private void chatroomList_Click(object sender, EventArgs e)
+        private void ChooseRoom(object sender, EventArgs e)
         {
             if (chatroomList.SelectedItem != null)
             {
-                messageBox.AppendText("\n" + chatroomList.SelectedItem.ToString());
+                SendToStream(new ChatLib.Message(codes.SENDING_SELECTED_ROOM, chatroomList.SelectedItem.ToString()), ref stream);
             }
-        }
-
-        private void chatroomList_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == (char)Keys.Enter)
-                chatroomList_Click(sender, e);
         }
         private void IRC_FormClosing(object sender, FormClosingEventArgs e)
         {
-            sendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE, ""), ref stream);
+            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE, ""), ref stream);
             Disconnect();
         }
     }

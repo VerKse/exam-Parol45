@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="lib\ClientClass.cs" />
     <Compile Include="lib\DBmanager.cs" />
+    <Compile Include="lib\Room.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="lib\ServerEngine.cs" />

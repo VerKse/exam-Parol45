@@ -31,13 +31,13 @@
             this.mainTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.TableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.inputField = new System.Windows.Forms.TextBox();
+            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.onlineUsersLabel = new System.Windows.Forms.TextBox();
             this.onlineUsersList = new System.Windows.Forms.ListBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.chatroomList = new System.Windows.Forms.ListBox();
             this.chatroomsLabel = new System.Windows.Forms.TextBox();
-            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.mainTableLayout.SuspendLayout();
             this.TableLayout.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -87,6 +87,18 @@
             this.inputField.Size = new System.Drawing.Size(530, 20);
             this.inputField.TabIndex = 5;
             this.inputField.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendChatMessage);
+            // 
+            // messageBox
+            // 
+            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.messageBox.Location = new System.Drawing.Point(5, 5);
+            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
+            this.messageBox.Name = "messageBox";
+            this.messageBox.ReadOnly = true;
+            this.messageBox.Size = new System.Drawing.Size(530, 456);
+            this.messageBox.TabIndex = 6;
+            this.messageBox.TabStop = false;
+            this.messageBox.Text = "";
             // 
             // tableLayoutPanel2
             // 
@@ -158,8 +170,7 @@
             this.chatroomList.Name = "chatroomList";
             this.chatroomList.Size = new System.Drawing.Size(129, 456);
             this.chatroomList.TabIndex = 8;
-            this.chatroomList.Click += new System.EventHandler(this.chatroomList_Click);
-            this.chatroomList.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.chatroomList_KeyPress);
+            this.chatroomList.SelectedIndexChanged += new System.EventHandler(this.ChooseRoom);
             // 
             // chatroomsLabel
             // 
@@ -172,18 +183,6 @@
             this.chatroomsLabel.TabIndex = 9;
             this.chatroomsLabel.Text = "Chatrooms:";
             this.chatroomsLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // messageBox
-            // 
-            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.messageBox.Location = new System.Drawing.Point(5, 5);
-            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
-            this.messageBox.Name = "messageBox";
-            this.messageBox.ReadOnly = true;
-            this.messageBox.Size = new System.Drawing.Size(530, 456);
-            this.messageBox.TabIndex = 6;
-            this.messageBox.TabStop = false;
-            this.messageBox.Text = "";
             // 
             // IRC
             // 

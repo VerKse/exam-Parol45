@@ -2,7 +2,6 @@
 using System.Net.Sockets;
 using Newtonsoft.Json;
 
-
 namespace ChatLib
 {
     public static class Interactions
@@ -20,19 +19,19 @@ namespace ChatLib
             SENDING_DISCONNECT_MESSAGE,
             REQUESTING_ROOMLIST,
             REQUESTING_USERLIST,
-            REQUESTNG_MESSAGE_HISTORY,
+            REQUESTING_MESSAGE_HISTORY,
             REQUESTING_USERNAME,
             CONFIRMING_USERNAME
         }
         // Отправка в поток преобразованного в json объекта класса Message.
-        public static void sendToStream(Message message, ref NetworkStream stream)
+        public static void SendToStream(Message message, ref NetworkStream stream)
         {
             byte[] data = Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(message));
             if (stream != null && stream.CanWrite)
                 stream.Write(data, 0, data.Length);
         }
-        // Получение сообщения из потока и его расшифровка из jsona в объект класса Message.
-        public static Message getFromStream(ref NetworkStream stream)
+        // Получение сообщения из потока и его расшифровка из jsona в объект класса Message. (Стрим должен быть живой)
+        public static Message GetFromStream(ref NetworkStream stream)
         {
             StringBuilder builder = new StringBuilder();
             byte[] data = new byte[64];

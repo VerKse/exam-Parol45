@@ -9,37 +9,78 @@ using static ChatLib.Interactions;
 
 namespace ChatServer.lib
 {
-    class ServerEngine
+    static class ServerEngine
     {
-        int idForNextUser = 0;
-        string name;
-        public List<ClientClass> connectedUsers = new List<ClientClass>();
-        TcpListener listener;
-
-        public ServerEngine(string name = "")
+        static int idForNextUser = 0;
+        static TcpListener listener;
+        public static List<Room> rooms = new List<Room>();
+        public static List<string> existingNicknames = new List<string>();
+        private static void LogIn(TcpClient client)
         {
-            this.name = name;
+            Message message;
+            string name = null;
+            bool served = false;
+            NetworkStream stream = client.GetStream();
+            while (!served)
+                try
+                {
+                    if (stream != null && stream.CanRead)
+                    {
+                        message = GetFromStream(ref stream);
+                        switch (message.code)
+                        {
+                            case codes.REQUESTING_ROOMLIST:
+                                SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList()), ref stream);
+                                break;
+                            case codes.SENDING_USERNAME:
+                                if (existingNicknames.FirstOrDefault(n => n == message.info) == null)
+                                {
+                                    name = message.info;
+                                    existingNicknames.Add(name);
+                                    SendToStream(new Message(codes.CONFIRMING_USERNAME, name), ref stream);
+                                    Console.WriteLine("User " + name + " logged in.");
+                                }
+                                else
+                                {
+                                    SendToStream(new Message(codes.REQUESTING_USERNAME,
+                                        "There is user witn nickname \"" + message.info + "\" already"), ref stream);
+                                    Console.WriteLine("There is user witn nickname " + name + " already");
+                                }
+                                break;
+                            case codes.SENDING_SELECTED_ROOM:
+                                if (name != null && rooms.FirstOrDefault(r => r.name == message.info) != null)
+                                {
+                                    ClientClass clientObj = new ClientClass(ref client, name, idForNextUser++);
+                                    rooms.FirstOrDefault(r => r.name == message.info).AddClient(clientObj);
+                                    Task.Run(() => clientObj.Process());
+                                    served = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Bad room name.");
+                                }
+                                break;
+                                // TODO: обработка запроса онлайн-листа и остальных кодов.
+                        }
+                    }
+                    else
+                    {
+                        served = true;
+                        if (name != null)
+                            existingNicknames.Remove(name);
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Console.WriteLine("In LogIn(): " + e.Message);
+                    if (stream != null)
+                        stream.Close();
+                    if (client != null)
+                        client.Close();
+                    Console.WriteLine("Anon disconnected");
+                }
         }
-        // Добавление в коллекцию нового клиента и создание выделенного потока (task ~= thread) для него.
-        protected internal void AddNewClient(ClientClass client)
-        {
-            connectedUsers.Add(client);
-            Console.WriteLine("Successfully added client to collection. There are " + connectedUsers.Count + " connected users.");
-            Task.Run(() => client.Process());
-        }
-        // Удаление из коллекции пользователя с заданным id (Да, из-за постоянных переподключений он за границы выйти может).
-        protected internal void RemoveClient(int id)
-        {
-            ClientClass client = connectedUsers.FirstOrDefault(c => c.id== id);
-            if (client != null)
-            {
-                connectedUsers.Remove(client);
-                UpdateAll(client.name + " has disconnected.");
-                Console.WriteLine(client.name + " has disconnected.");
-            }
-        }
-        // Ожидание новых подключений с любого адреса.
-        public void Listen()
+        public static void Listen()
         {
             try
             {
@@ -47,10 +88,10 @@ namespace ChatServer.lib
                 listener.Start();
                 while (true)
                 {
-                    Console.WriteLine("Waiting for connections... ");
+                    Console.WriteLine("Waiting for connections...");
                     TcpClient client = listener.AcceptTcpClient();
-                    Console.WriteLine("Somebody has connected.");
-                    AddNewClient(new ClientClass(client, this, idForNextUser++));
+                    Console.WriteLine("Somebody connected.");
+                    Task.Run(() => LogIn(client));
                 }
             }
             catch (Exception e)
@@ -58,16 +99,11 @@ namespace ChatServer.lib
                 Console.WriteLine("In Listen(): " + e.Message);
             }
         }
-        // Широковещательная рассылка сообщения или подкл/откл пользователя.
-        public void UpdateAll(string message)
+        public static void ChangeRoom(ClientClass client, string newRoom)
         {
-            Console.Write("Broadcasting for: ");
-            for (int i = 0; i < connectedUsers.Count; i++)
-            {
-                Console.Write(connectedUsers[i].name + (i + 1 == connectedUsers.Count ? "." : ", "));
-                sendToStream(new Message(codes.SENDING_BROADCAST_MESSAGE, message), ref connectedUsers[i].Stream);
-            }
-            Console.WriteLine();
+            client.room.RemoveClient(client.id);
+            rooms.FirstOrDefault(r => r.name == newRoom).AddClient(client);
         }
+        // TODO: добавление/удаление комнат.
     }
 }

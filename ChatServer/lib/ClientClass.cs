@@ -10,56 +10,46 @@ namespace ChatServer.lib
     {
         protected internal int id { get; private set; }
         protected internal string name { get; private set; }
-        TcpClient Client;
-        ServerEngine Server;
-        public NetworkStream Stream;
-        public ClientClass(TcpClient client, ServerEngine server, int id)
+        TcpClient client;
+        public NetworkStream stream;
+        public Room room;
+        public ClientClass(ref TcpClient client, string name, int id)
         {
-            Client = client;
-            Server = server;
+            this.client = client;
+            this.name = name;
             this.id = id;
+            stream = client.GetStream();
         }
         // Обработка получаемых от клиента пакетов.
         public void Process()
         {
             try
             {
-                Stream = Client.GetStream();
                 Message message;
                 while (true)
                 {
-                    message = getFromStream(ref Stream);
+                    message = GetFromStream(ref stream);
                     switch (message.code)
                     {
-                        case codes.SENDING_USERNAME:
-                            if (Server.connectedUsers.FirstOrDefault(c => c.name == message.info) == null)
-                            {
-                                name = message.info;
-                                sendToStream(new Message(codes.CONFIRMING_USERNAME, name), ref Stream);
-                                Server.UpdateAll(name + " has connected.");
-                                Console.WriteLine(name + " has connected.");
-                            }
-                            else
-                            {
-                                sendToStream(new Message(codes.REQUESTING_USERNAME, 
-                                    "There is user witn nickname \"" + message.info + "\" in this room already"), ref Stream);
-                                Console.WriteLine("There is user witn nickname " + name + " already");
-                            }
-                            break;
                         case codes.REQUESTING_ROOMLIST:
-                            sendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList()), ref Stream);
+                            SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList()), ref stream);
                             break;
                         case codes.SENDING_CHAT_MESSAGE:
-                            Server.UpdateAll(name + ": " + message.info);
+                            room.SendBroadcastMessage(name + ": " + message.info);
                             Console.WriteLine(name + ": " + message.info);
+                            break;
+                        case codes.SENDING_SELECTED_ROOM:
+                            ServerEngine.ChangeRoom(this, message.info);
                             break;
                         case codes.SENDING_DISCONNECT_MESSAGE:
                             Disconnect();
-                            Server.RemoveClient(id);
+                            ServerEngine.existingNicknames.Remove(name);
+                            room.RemoveClient(id);
                             return;
                         default:
-                            Console.WriteLine("Wrong message code. With package body: " + message.info + ".");
+                            Console.WriteLine("Wrong message code with package body: " + message.info + ".");
                             break;
+                        // TODO: добавить обработку остальных кодов.
                     }
                 }
             }
@@ -67,16 +57,16 @@ namespace ChatServer.lib
             {
                 Console.WriteLine("In Process(): " + e.Message);
                 Disconnect();
-                Server.RemoveClient(id);
+                room.RemoveClient(id);
             }
         }
         // Закрытие объектов, отвечающих за подключение.
         public void Disconnect()
         {
-            if (Stream != null)
-                Stream.Close();
-            if (Client != null)
-                Client.Close();
+            if (stream != null)
+                stream.Close();
+            if (client != null)
+                client.Close();
         }
     }
 }
