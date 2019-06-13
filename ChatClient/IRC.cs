@@ -12,7 +12,8 @@ namespace ChatClient
         private const string host = "46.173.214.207";
         static TcpClient client;
         static NetworkStream stream;
-        codes lastServReqest = codes.REQUESTING_USERNAME;
+        int selectedRoom;
+        bool loggedIn = false;
         public IRC()
         {
             InitializeComponent();
@@ -29,12 +30,10 @@ namespace ChatClient
             {
                 client = new TcpClient(host, 1488);
                 stream = client.GetStream();
-                if (client != null && stream != null)
-                {
-                    PrintToMessageBox("Connected to server. Please enter your nickname.", messageBox);
-                    SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref client);
-                    Task.Run(() => GetNewMessages());
-                }
+                PrintToMessageBox("Connected to server. Please enter your nickname.", messageBox);
+                SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref client);
+                chatroomList.BeginInvoke(new Action(() => selectedRoom = chatroomList.SelectedIndex));
+                Task.Run(() => GetNewMessages());
             }
             catch (Exception e)
             {
@@ -51,15 +50,12 @@ namespace ChatClient
                         Task.Run(() => Connect());
                     else
                     {
-                        switch (lastServReqest)
-                        {
-                            case codes.REQUESTING_USERNAME:
-                                SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, inputField.Text.Trim(' ')), ref client);
-                                lastServReqest = codes.SENDING_USERNAME;
-                                break;
-                            default:
-                                SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, inputField.Text.Trim(' ')), ref client);
-                                break;
+                        if (!loggedIn) {
+                            SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, inputField.Text.Trim(' ')), ref client);
+                            loggedIn = true;
+                        }
+                        else {
+                            SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, inputField.Text.Trim(' ')), ref client);
                         }
                         inputField.Text = "";
                     }
@@ -78,8 +74,6 @@ namespace ChatClient
             {
                 while (true)
                 {
-                    if (stream == null || !stream.CanRead)
-                        break;
                     message = GetFromStream(ref client);
                     switch (message.code)
                     {
@@ -93,7 +87,7 @@ namespace ChatClient
                             break;
                         case codes.REQUESTING_USERNAME:
                             PrintToMessageBox(message.info, messageBox);
-                            lastServReqest = codes.REQUESTING_USERNAME;
+                            loggedIn = false;
                             break;
                         case codes.SENDING_ROOMLIST:
                             IAsyncResult resultChatroom = chatroomList.BeginInvoke(new Action(() => chatroomList.Items.Clear()));
@@ -113,7 +107,7 @@ namespace ChatClient
                                 onlineUsersList.EndInvoke(resultUserlist);
                             }
                             messageBox.BeginInvoke(new Action(() => messageBox.Text = "Welcome."));
-                            message.list2.ForEach(l => PrintToMessageBox(l, messageBox));
+                            message.list2.ForEach(mess => PrintToMessageBox(mess, messageBox));
                             break;
                     }
                 }
@@ -127,22 +121,27 @@ namespace ChatClient
         }
         private void ChooseRoom(object sender, EventArgs e)
         {
-            if (chatroomList.SelectedItem != null)
+            if (chatroomList.SelectedIndex != selectedRoom)
             {
                 SendToStream(new ChatLib.Message(codes.SENDING_SELECTED_ROOM, chatroomList.SelectedItem.ToString()), ref client);
+                selectedRoom = chatroomList.SelectedIndex;
             }
-        }
-        static void Disconnect()
-        {
-            if (stream != null)
-                stream.Close();
-            if (client != null)
-                client.Close();
         }
         private void IRC_FormClosing(object sender, FormClosingEventArgs e)
         {
-            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE, ""), ref client);
+            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE, "diiiisssssconneeect"), ref client);
             Disconnect();
+        }
+        static void Disconnect()
+        {
+            try
+            {
+                if (stream != null)
+                    stream.Close();
+                if (client != null)
+                    client.Close();
+            }
+            catch { }
         }
     }
 }

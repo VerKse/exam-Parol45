@@ -67,7 +67,7 @@ namespace ChatServer.lib
             roomlist.Close();
             return result;
         }
-        public static void SaveMessage(string message, string roomName, MySqlConnection connection)
+        public static void SaveMessage(string message, string roomName, ref MySqlConnection connection)
         {
             MySqlCommand query = connection.CreateCommand();
             query.CommandText = "insert into `" + roomName + "_hist`(message, dt) values('" + message.Replace("'", "\'") + "', sysdate());";

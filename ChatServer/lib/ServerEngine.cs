@@ -27,7 +27,7 @@ namespace ChatServer.lib
                     Console.WriteLine("Waiting for connections...");
                     TcpClient client = listener.AcceptTcpClient();
                     Console.WriteLine("Somebody connected.");
-                    Task.Run(() => LogIn(client));
+                    Task.Run(() => LogIn(ref client));
                 }
             }
             catch (Exception e)
@@ -35,72 +35,66 @@ namespace ChatServer.lib
                 Console.WriteLine("In Listen(): " + e.Message);
             }
         }
-        private static void LogIn(TcpClient client)
+        private static void LogIn(ref TcpClient client)
         {
             Message message;
             string name = null;
             bool served = false;
-            NetworkStream stream = client.GetStream();
             try
             {
                 MySqlConnection connection = DBmanager.Connect();
                 while (!served)
-                    if (stream != null && stream.CanRead)
+                {
+                    message = GetFromStream(ref client);
+                    switch (message.code)
                     {
-                        message = GetFromStream(ref client);
-                        switch (message.code)
-                        {
-                            case codes.REQUESTING_ROOMLIST:
-                                SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection))
-                                    , ref client);
-                                break;
-                            case codes.SENDING_USERNAME:
-                                if (existingNicknames.FirstOrDefault(n => n == message.info) == null)
-                                {
-                                    name = message.info;
-                                    existingNicknames.Add(name);
-                                    SendToStream(new Message(codes.CONFIRMING_USERNAME, name), ref client);
-                                    Console.WriteLine("User " + name + " logged in.");
-                                }
-                                else
-                                {
-                                    SendToStream(new Message(codes.REQUESTING_USERNAME,
-                                        "There is user witn nickname \"" + message.info + "\" already"), ref client);
-                                    Console.WriteLine("There is user witn nickname " + name + " already");
-                                }
-                                break;
-                            case codes.SENDING_SELECTED_ROOM:
-                                if (name != null && rooms.FirstOrDefault(r => r.name == message.info) != null)
-                                {
-                                    ClientClass clientObj = new ClientClass(ref connection, ref client, name, idForNextUser++);
-                                    rooms.FirstOrDefault(r => r.name == message.info).AddClient(clientObj);
-                                    Task.Run(() => clientObj.Process());
-                                    served = true;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Bad room name.");
-                                }
-                                break;
-                        }
+                        case codes.REQUESTING_ROOMLIST:
+                            SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection))
+                                , ref client);
+                            break;
+                        case codes.SENDING_USERNAME:
+                            if (existingNicknames.FirstOrDefault(n => n == message.info) == null)
+                            {
+                                name = message.info;
+                                existingNicknames.Add(name);
+                                SendToStream(new Message(codes.CONFIRMING_USERNAME, name), ref client);
+                                Console.WriteLine("User " + name + " logged in.");
+                            }
+                            else
+                            {
+                                SendToStream(new Message(codes.REQUESTING_USERNAME,
+                                    "There is user witn nickname \"" + message.info + "\" already"), ref client);
+                            }
+                            break;
+                        case codes.SENDING_SELECTED_ROOM:
+                            if (name != null)
+                            {
+                                ClientClass clientObj = new ClientClass(ref connection, ref client, name, idForNextUser++);
+                                rooms.FirstOrDefault(r => r.name == message.info).AddClient(clientObj);
+                                Task.Run(() => clientObj.Process());
+                                served = true;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Bad room name.");
+                            }
+                            break;
+                        case codes.SENDING_DISCONNECT_MESSAGE:
+                            throw new Exception("Disconnected");
                     }
-                    else
-                    {
-                        if (connection != null)
-                            connection.Close();
-                        served = true;
-                        if (name != null)
-                            existingNicknames.Remove(name);
-                    }
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine("In LogIn(): " + e.Message);
-                if (stream != null)
-                    stream.Close();
                 if (client != null)
+                {
+                    client.GetStream().Close();
                     client.Close();
-                Console.WriteLine("Anon disconnected");
+                }
+                Console.WriteLine((name == null ? "Anon" : name) + " disconnected");
+                if (name != null)
+                    existingNicknames.Remove(name);
             }
         }
         public static void ChangeRoom(ClientClass client, string newRoom)
