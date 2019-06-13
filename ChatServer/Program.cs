@@ -8,7 +8,7 @@ namespace ChatServer
 
         static void Main(string[] args)
         {
-            Console.WriteLine("ver 0.2.0");
+            Console.WriteLine("ver 0.3.0");
             // Создаём возможно отсутствующие объекты в бд.
             DBmanager.Initialize();
             // Ждём пользователей в бесконечном цикле.

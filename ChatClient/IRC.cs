@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
@@ -51,11 +52,19 @@ namespace ChatClient
                     else
                     {
                         if (!loggedIn) {
-                            SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, inputField.Text.Trim(' ')), ref client);
-                            loggedIn = true;
+                            if (inputField.Text.Trim(' ').Length < 51)
+                            {
+                                SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, inputField.Text.Trim(' ')), ref client);
+                                loggedIn = true;
+                            }
+                            else
+                                PrintToMessageBox("Nickname must be less than 51 characters.", messageBox);
                         }
                         else {
-                            SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, inputField.Text.Trim(' ')), ref client);
+                            if (inputField.Text.Trim(' ').Length < 948)
+                                SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, inputField.Text.Trim(' ')), ref client);
+                            else
+                                PrintToMessageBox("Your message is way too long.", messageBox);
                         }
                         inputField.Text = "";
                     }
@@ -77,8 +86,8 @@ namespace ChatClient
                     message = GetFromStream(ref client);
                     switch (message.code)
                     {
-                        case codes.SENDING_BROADCAST_MESSAGE:
-                            PrintToMessageBox(message.info, messageBox);
+                        case codes.SENDING_ROOMLIST:
+                            SetListboxItems(chatroomList, message.list);
                             break;
                         case codes.CONFIRMING_USERNAME:
                             BeginInvoke(new Action(() => Text = message.info + " - " + Text));
@@ -89,25 +98,15 @@ namespace ChatClient
                             PrintToMessageBox(message.info, messageBox);
                             loggedIn = false;
                             break;
-                        case codes.SENDING_ROOMLIST:
-                            IAsyncResult resultChatroom = chatroomList.BeginInvoke(new Action(() => chatroomList.Items.Clear()));
-                            chatroomList.EndInvoke(resultChatroom);
-                            for (int i = 0; i < message.list.Count; i++)
-                            {
-                                resultChatroom = chatroomList.BeginInvoke(new Action(() => chatroomList.Items.Add(message.list[i])));
-                                chatroomList.EndInvoke(resultChatroom);
-                            }
+                        case codes.SENDING_USERLIST:
+                            SetListboxItems(onlineUsersList, message.list);
                             break;
-                        case codes.SENDING_CHAT_INFO:
-                            IAsyncResult resultUserlist = onlineUsersList.BeginInvoke(new Action(() => onlineUsersList.Items.Clear()));
-                            onlineUsersList.EndInvoke(resultUserlist);
-                            for (int i = 0; i < message.list.Count; i++)
-                            {
-                                resultUserlist = onlineUsersList.BeginInvoke(new Action(() => onlineUsersList.Items.Add(message.list[i])));
-                                onlineUsersList.EndInvoke(resultUserlist);
-                            }
+                        case codes.SENDING_CHAT_HIST:
                             messageBox.BeginInvoke(new Action(() => messageBox.Text = "Welcome."));
-                            message.list2.ForEach(mess => PrintToMessageBox(mess, messageBox));
+                            message.list.ForEach(mess => PrintToMessageBox(mess, messageBox));
+                            break;
+                        case codes.SENDING_BROADCAST_MESSAGE:
+                            PrintToMessageBox(message.info, messageBox);
                             break;
                     }
                 }
@@ -117,6 +116,16 @@ namespace ChatClient
                 PrintToMessageBox("In GetNewMessages(): " + e.Message, messageBox);
                 PrintToMessageBox("Disconnected from server", messageBox);
                 Disconnect();
+            }
+        }
+        private void SetListboxItems(ListBox subj, List<string> list)
+        {
+            IAsyncResult resultUserlist = subj.BeginInvoke(new Action(() => subj.Items.Clear()));
+            onlineUsersList.EndInvoke(resultUserlist);
+            for (int i = 0; i < list.Count; i++)
+            {
+                resultUserlist = subj.BeginInvoke(new Action(() => subj.Items.Add(list[i])));
+                subj.EndInvoke(resultUserlist);
             }
         }
         private void ChooseRoom(object sender, EventArgs e)
@@ -129,7 +138,7 @@ namespace ChatClient
         }
         private void IRC_FormClosing(object sender, FormClosingEventArgs e)
         {
-            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE, "diiiisssssconneeect"), ref client);
+            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
             Disconnect();
         }
         static void Disconnect()

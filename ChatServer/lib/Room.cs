@@ -23,10 +23,10 @@ namespace ChatServer.lib
             connectedUsers.Add(client);
             Console.WriteLine("Successfully added client " + client.name + " to " + name +
                 " room. There are " + connectedUsers.Count + " connected users.");
-            // TODO: Разбить на два пакета: с юзерлистом и историей сообщений.
-            connectedUsers.ForEach(user => SendToStream(new Message(codes.SENDING_CHAT_INFO,
-                list: connectedUsers.Select(u => u.name).ToList(), list2: DBmanager.GetHistory(name, user.connection)), ref user.client));
-            Task.Run(() => SendBroadcastMessage(client.name + " joined the room.", client.connection));
+            connectedUsers.ForEach(user => SendToStream(new Message(codes.SENDING_USERLIST,
+                list: connectedUsers.Select(u => u.name).ToList()), ref user.client));
+            SendToStream(new Message(codes.SENDING_CHAT_HIST, list: DBmanager.GetHistory(name, client.connection)), ref client.client);
+            Task.Run(() => SendBroadcastMessage(client.name + " joined the room.", connection));
         }
         protected internal void RemoveClient(int id)
         {
@@ -34,8 +34,8 @@ namespace ChatServer.lib
             if (client != null)
                 connectedUsers.Remove(client);
             Task.Run(() => SendBroadcastMessage(client.name + " left the room.", connection));
-            connectedUsers.ForEach(user => SendToStream(new Message(codes.SENDING_CHAT_INFO,
-                list: connectedUsers.Select(u => u.name).ToList(), list2: DBmanager.GetHistory(name, user.connection)), ref user.client));
+            connectedUsers.ForEach(user => SendToStream(new Message(codes.SENDING_USERLIST,
+                list: connectedUsers.Select(u => u.name).ToList()), ref user.client));
             Console.WriteLine(client.name + " left the " + name + " room. There are " + connectedUsers.Count + " connected users.");
         }
         public void SendBroadcastMessage(string message, MySqlConnection connection)

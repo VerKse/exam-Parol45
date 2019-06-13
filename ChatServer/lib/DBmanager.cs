@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 namespace ChatServer.lib
@@ -38,7 +35,8 @@ namespace ChatServer.lib
                 for (int i = 0; i < chatRooms.Count; i++)
                 {
                     initializator.CommandText =
-                        "create table if not exists `" + chatRooms[i] + "_hist`(message nvarchar(1000) not null, dt datetime(6) not null primary key);";
+                        "create table if not exists `" + chatRooms[i] + "_hist`(message nvarchar(1000) not null," +
+                        " dt datetime(6) not null, id int not null auto_increment primary key);";
                     initializator.ExecuteNonQuery();
                     Console.Write(chatRooms[i] + (i == chatRooms.Count - 1 ? "" : ", "));
                     ServerEngine.rooms.Add(new Room(chatRooms[i]));
@@ -50,7 +48,8 @@ namespace ChatServer.lib
                 selection.Close();
                 initializator.CommandText = "insert into rooms(name) values('Фаны Валакаса');";
                 initializator.ExecuteNonQuery();
-                initializator.CommandText = "create table if not exists `Фаны Валакаса_hist`(message nvarchar(1000) not null, dt datetime(6) not null primary key);";
+                initializator.CommandText = "create table if not exists `Фаны Валакаса_hist`(message nvarchar(1000) not null" +
+                    ", dt datetime(6) not null, id int not null auto_increment primary key);";
                 initializator.ExecuteNonQuery();
                 Console.WriteLine("There are no rooms. Inserted default one and created hist table for it.");
             }
@@ -70,7 +69,8 @@ namespace ChatServer.lib
         public static void SaveMessage(string message, string roomName, ref MySqlConnection connection)
         {
             MySqlCommand query = connection.CreateCommand();
-            query.CommandText = "insert into `" + roomName + "_hist`(message, dt) values('" + message.Replace("'", "\'") + "', sysdate());";
+            query.CommandText = "insert into `" + roomName + "_hist`(message, dt) values('" + message.Replace("'", "\"") + 
+                "', sysdate()); commit;";
             query.ExecuteNonQuery();
         }
         public static List<string> GetHistory(string roomName, MySqlConnection connection)

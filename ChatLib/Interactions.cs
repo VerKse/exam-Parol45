@@ -15,10 +15,12 @@ namespace ChatLib
             SENDING_CHAT_MESSAGE,
             SENDING_DISCONNECT_MESSAGE,
             SENDING_ROOMLIST,
-            SENDING_CHAT_INFO,
+            SENDING_USERLIST,
+            SENDING_CHAT_HIST,
             SENDING_BROADCAST_MESSAGE,
             REQUESTING_ROOMLIST,
-            REQUESTING_CHAT_INFO,
+            REQUESTING_USERLIST,
+            REQUESTING_CHAT_HIST,
             REQUESTING_USERNAME,
             CONFIRMING_USERNAME
         }
@@ -48,7 +50,7 @@ namespace ChatLib
             int toGet = 0, got = 0, from = 0, bytes = 0;
             do
             {
-                bytes = stream.Read(data, 0, data.Length);
+                bytes = stream.Read(data, 0, (toGet != 0 && toGet - got < data.Length ? toGet - got : data.Length));
                 got += bytes;
                 builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
                 if (toGet == 0 && builder.Length > 0)
