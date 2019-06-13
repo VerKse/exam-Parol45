@@ -35,6 +35,9 @@ namespace ChatServer.lib
                         case codes.REQUESTING_ROOMLIST:
                             SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection)), ref client);
                             break;
+                        case codes.REQUESTING_CHAT_HIST:
+                            SendToStream(new Message(codes.SENDING_CHAT_HIST, list: DBmanager.GetHistory(name, connection)), ref client);
+                            break;
                         case codes.SENDING_CHAT_MESSAGE:
                             room.SendBroadcastMessage(name + ": " + message.info, connection);
                             Console.WriteLine(name + ": " + message.info);

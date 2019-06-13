@@ -67,17 +67,10 @@ namespace ChatServer.lib
                             }
                             break;
                         case codes.SENDING_SELECTED_ROOM:
-                            if (name != null)
-                            {
-                                ClientClass clientObj = new ClientClass(ref connection, ref client, name, idForNextUser++);
-                                rooms.FirstOrDefault(r => r.name == message.info).AddClient(clientObj);
-                                Task.Run(() => clientObj.Process());
-                                served = true;
-                            }
-                            else
-                            {
-                                Console.WriteLine("Bad room name.");
-                            }
+                            ClientClass clientObj = new ClientClass(ref connection, ref client, name, idForNextUser++);
+                            rooms.FirstOrDefault(r => r.name == message.info).AddClient(clientObj);
+                            Task.Run(() => clientObj.Process());
+                            served = true;
                             break;
                         case codes.SENDING_DISCONNECT_MESSAGE:
                             throw new Exception("Disconnected");
@@ -102,6 +95,5 @@ namespace ChatServer.lib
             client.room.RemoveClient(client.id);
             rooms.FirstOrDefault(r => r.name == newRoom).AddClient(client);
         }
-        // TODO: добавление/удаление комнат.
     }
 }

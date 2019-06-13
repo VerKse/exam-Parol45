@@ -45,8 +45,8 @@ namespace ChatServer.lib
             for (int i = 0; i < connectedUsers.Count; i++)
             {
                 Console.Write(connectedUsers[i].name + (i + 1 == connectedUsers.Count ? "" : ", "));
-                // TODO: Добавить дату-время сообщений.
-                SendToStream(new Message(codes.SENDING_BROADCAST_MESSAGE, message), ref connectedUsers[i].client);
+                SendToStream(new Message(codes.SENDING_BROADCAST_MESSAGE, DateTime.Now.ToString("HH:mm:ss") +
+                    "  ||  " + message), ref connectedUsers[i].client);
             }
             Console.WriteLine(".");
         }

@@ -6,8 +6,8 @@ namespace ChatServer.lib
 {
     static class DBmanager
     {
-        const string host = "46.173.214.207"; // поменять на localhost
-        const string user = "client"; // поменять на root 
+        const string host = "localhost";
+        const string user = "client";
         const string password = "12345a";
         public static string connectionString = "Datasource=" + host + ";User=" + user + ";Password=" + password + ";charset=utf8";
         public static void Initialize()
@@ -55,6 +55,15 @@ namespace ChatServer.lib
             }
             connection.Close();
         }
+        public static MySqlConnection Connect()
+        {
+            MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+            MySqlCommand query = connection.CreateCommand();
+            query.CommandText = "use Chat;";
+            query.ExecuteNonQuery();
+            return connection;
+        }
         public static List<string> GetRoomList(MySqlConnection connection)
         {
             List<string> result = new List<string>();
@@ -77,21 +86,13 @@ namespace ChatServer.lib
         {
             List<string> hist = new List<string>();
             MySqlCommand query = connection.CreateCommand();
-            query.CommandText = "select message from `" + roomName + "_hist` order by dt;";
+            query.CommandText = "select concat(date_format(dt, '%H:%m:%s'),'  ||  ', message) from `" 
+                + roomName + "_hist` order by id;";
             MySqlDataReader selection = query.ExecuteReader();
             while (selection.Read())
                 hist.Add(selection.GetString(0));
             selection.Close();
             return hist;
-        }
-        public static MySqlConnection Connect()
-        {
-            MySqlConnection connection = new MySqlConnection(connectionString);
-            connection.Open();
-            MySqlCommand query = connection.CreateCommand();
-            query.CommandText = "use Chat;";
-            query.ExecuteNonQuery();
-            return connection;
         }
     }
 }
