@@ -28,21 +28,48 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.mainTableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.TableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.inputField = new System.Windows.Forms.TextBox();
-            this.messageBox = new ChatClient.lib.RichTextBoxEx();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.onlineUsersLabel = new System.Windows.Forms.TextBox();
-            this.onlineUsersList = new System.Windows.Forms.ListBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.mainTableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.chatroomLayout = new System.Windows.Forms.TableLayoutPanel();
             this.chatroomList = new System.Windows.Forms.ListBox();
             this.chatroomsLabel = new System.Windows.Forms.TextBox();
-            this.mainTableLayout.SuspendLayout();
-            this.TableLayout.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
+            this.TableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.inputTextBox = new System.Windows.Forms.RichTextBox();
+            this.userlistLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.onlineUsersLabel = new System.Windows.Forms.TextBox();
+            this.onlineUsersList = new System.Windows.Forms.ListBox();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reconnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.disconnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.roomsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.leaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.tableLayoutPanel1.SuspendLayout();
+            this.mainTableLayout.SuspendLayout();
+            this.chatroomLayout.SuspendLayout();
+            this.TableLayout.SuspendLayout();
+            this.userlistLayout.SuspendLayout();
+            this.menuStrip.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.mainTableLayout, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.menuStrip, 0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(685, 409);
+            this.tableLayoutPanel1.TabIndex = 2;
             // 
             // mainTableLayout
             // 
@@ -50,71 +77,105 @@
             this.mainTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17F));
             this.mainTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 66F));
             this.mainTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17F));
+            this.mainTableLayout.Controls.Add(this.chatroomLayout, 0, 0);
             this.mainTableLayout.Controls.Add(this.TableLayout, 1, 0);
-            this.mainTableLayout.Controls.Add(this.tableLayoutPanel2, 2, 0);
-            this.mainTableLayout.Controls.Add(this.tableLayoutPanel1, 0, 0);
+            this.mainTableLayout.Controls.Add(this.userlistLayout, 2, 0);
             this.mainTableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mainTableLayout.Location = new System.Drawing.Point(0, 0);
+            this.mainTableLayout.Location = new System.Drawing.Point(3, 28);
             this.mainTableLayout.Name = "mainTableLayout";
             this.mainTableLayout.RowCount = 1;
             this.mainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.mainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 496F));
-            this.mainTableLayout.Size = new System.Drawing.Size(819, 496);
-            this.mainTableLayout.TabIndex = 0;
+            this.mainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 378F));
+            this.mainTableLayout.Size = new System.Drawing.Size(679, 378);
+            this.mainTableLayout.TabIndex = 1;
+            // 
+            // chatroomLayout
+            // 
+            this.chatroomLayout.ColumnCount = 1;
+            this.chatroomLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.chatroomLayout.Controls.Add(this.chatroomList, 0, 1);
+            this.chatroomLayout.Controls.Add(this.chatroomsLabel, 0, 0);
+            this.chatroomLayout.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.chatroomLayout.Location = new System.Drawing.Point(0, 0);
+            this.chatroomLayout.Margin = new System.Windows.Forms.Padding(0);
+            this.chatroomLayout.Name = "chatroomLayout";
+            this.chatroomLayout.RowCount = 2;
+            this.chatroomLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.chatroomLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.chatroomLayout.Size = new System.Drawing.Size(115, 378);
+            this.chatroomLayout.TabIndex = 4;
+            // 
+            // chatroomList
+            // 
+            this.chatroomList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.chatroomList.Enabled = false;
+            this.chatroomList.FormattingEnabled = true;
+            this.chatroomList.IntegralHeight = false;
+            this.chatroomList.Items.AddRange(new object[] {
+            "Loading..."});
+            this.chatroomList.Location = new System.Drawing.Point(5, 35);
+            this.chatroomList.Margin = new System.Windows.Forms.Padding(5);
+            this.chatroomList.Name = "chatroomList";
+            this.chatroomList.Size = new System.Drawing.Size(105, 338);
+            this.chatroomList.TabIndex = 8;
+            this.chatroomList.SelectedIndexChanged += new System.EventHandler(this.ChooseRoom);
+            // 
+            // chatroomsLabel
+            // 
+            this.chatroomsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.chatroomsLabel.Location = new System.Drawing.Point(5, 5);
+            this.chatroomsLabel.Margin = new System.Windows.Forms.Padding(5);
+            this.chatroomsLabel.Name = "chatroomsLabel";
+            this.chatroomsLabel.ReadOnly = true;
+            this.chatroomsLabel.Size = new System.Drawing.Size(105, 20);
+            this.chatroomsLabel.TabIndex = 9;
+            this.chatroomsLabel.Text = "Chatrooms:";
+            this.chatroomsLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // TableLayout
             // 
             this.TableLayout.ColumnCount = 1;
             this.TableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TableLayout.Controls.Add(this.inputField, 0, 1);
             this.TableLayout.Controls.Add(this.messageBox, 0, 0);
+            this.TableLayout.Controls.Add(this.inputTextBox, 0, 1);
             this.TableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayout.Location = new System.Drawing.Point(139, 0);
+            this.TableLayout.Location = new System.Drawing.Point(115, 0);
             this.TableLayout.Margin = new System.Windows.Forms.Padding(0);
             this.TableLayout.Name = "TableLayout";
             this.TableLayout.RowCount = 2;
-            this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.TableLayout.Size = new System.Drawing.Size(540, 496);
+            this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 90F));
+            this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.TableLayout.Size = new System.Drawing.Size(448, 378);
             this.TableLayout.TabIndex = 0;
             // 
-            // inputField
+            // inputTextBox
             // 
-            this.inputField.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.inputField.Location = new System.Drawing.Point(5, 471);
-            this.inputField.Margin = new System.Windows.Forms.Padding(5);
-            this.inputField.Name = "inputField";
-            this.inputField.Size = new System.Drawing.Size(530, 20);
-            this.inputField.TabIndex = 5;
-            this.inputField.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendChatMessage);
+            this.inputTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.inputTextBox.Enabled = false;
+            this.inputTextBox.Location = new System.Drawing.Point(5, 345);
+            this.inputTextBox.Margin = new System.Windows.Forms.Padding(5);
+            this.inputTextBox.Name = "inputTextBox";
+            this.inputTextBox.Size = new System.Drawing.Size(438, 28);
+            this.inputTextBox.TabIndex = 7;
+            this.inputTextBox.Text = "";
+            this.inputTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendChatMessage);
+            this.inputTextBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.inputTextBox_PreviewKeyDown);
             // 
-            // messageBox
+            // userlistLayout
             // 
-            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.messageBox.Location = new System.Drawing.Point(5, 5);
-            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
-            this.messageBox.Name = "messageBox";
-            this.messageBox.ReadOnly = true;
-            this.messageBox.Size = new System.Drawing.Size(530, 456);
-            this.messageBox.TabIndex = 6;
-            this.messageBox.TabStop = false;
-            this.messageBox.Text = "";
-            // 
-            // tableLayoutPanel2
-            // 
-            this.tableLayoutPanel2.ColumnCount = 1;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Controls.Add(this.onlineUsersLabel, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.onlineUsersList, 0, 1);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(679, 0);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 2;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(140, 496);
-            this.tableLayoutPanel2.TabIndex = 1;
+            this.userlistLayout.ColumnCount = 1;
+            this.userlistLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.userlistLayout.Controls.Add(this.onlineUsersLabel, 0, 0);
+            this.userlistLayout.Controls.Add(this.onlineUsersList, 0, 1);
+            this.userlistLayout.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.userlistLayout.Location = new System.Drawing.Point(563, 0);
+            this.userlistLayout.Margin = new System.Windows.Forms.Padding(0);
+            this.userlistLayout.Name = "userlistLayout";
+            this.userlistLayout.RowCount = 2;
+            this.userlistLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.userlistLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.userlistLayout.Size = new System.Drawing.Size(116, 378);
+            this.userlistLayout.TabIndex = 1;
             // 
             // onlineUsersLabel
             // 
@@ -123,7 +184,7 @@
             this.onlineUsersLabel.Margin = new System.Windows.Forms.Padding(5);
             this.onlineUsersLabel.Name = "onlineUsersLabel";
             this.onlineUsersLabel.ReadOnly = true;
-            this.onlineUsersLabel.Size = new System.Drawing.Size(130, 20);
+            this.onlineUsersLabel.Size = new System.Drawing.Size(106, 20);
             this.onlineUsersLabel.TabIndex = 9;
             this.onlineUsersLabel.Text = "Users online:";
             this.onlineUsersLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -137,87 +198,139 @@
             this.onlineUsersList.Location = new System.Drawing.Point(5, 35);
             this.onlineUsersList.Margin = new System.Windows.Forms.Padding(5);
             this.onlineUsersList.Name = "onlineUsersList";
-            this.onlineUsersList.Size = new System.Drawing.Size(130, 456);
+            this.onlineUsersList.Size = new System.Drawing.Size(106, 338);
             this.onlineUsersList.TabIndex = 8;
             // 
-            // tableLayoutPanel1
+            // menuStrip
             // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.chatroomList, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.chatroomsLabel, 0, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(139, 496);
-            this.tableLayoutPanel1.TabIndex = 2;
+            this.menuStrip.GripMargin = new System.Windows.Forms.Padding(0);
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.roomsToolStripMenuItem,
+            this.helpToolStripMenuItem});
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(685, 24);
+            this.menuStrip.TabIndex = 2;
             // 
-            // chatroomList
+            // fileToolStripMenuItem
             // 
-            this.chatroomList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.chatroomList.Enabled = false;
-            this.chatroomList.FormattingEnabled = true;
-            this.chatroomList.IntegralHeight = false;
-            this.chatroomList.Items.AddRange(new object[] {
-            "Loading..."});
-            this.chatroomList.Location = new System.Drawing.Point(5, 35);
-            this.chatroomList.Margin = new System.Windows.Forms.Padding(5);
-            this.chatroomList.Name = "chatroomList";
-            this.chatroomList.Size = new System.Drawing.Size(129, 456);
-            this.chatroomList.TabIndex = 8;
-            this.chatroomList.SelectedIndexChanged += new System.EventHandler(this.ChooseRoom);
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.reconnectToolStripMenuItem,
+            this.disconnectToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
             // 
-            // chatroomsLabel
+            // reconnectToolStripMenuItem
             // 
-            this.chatroomsLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.chatroomsLabel.Location = new System.Drawing.Point(5, 5);
-            this.chatroomsLabel.Margin = new System.Windows.Forms.Padding(5);
-            this.chatroomsLabel.Name = "chatroomsLabel";
-            this.chatroomsLabel.ReadOnly = true;
-            this.chatroomsLabel.Size = new System.Drawing.Size(129, 20);
-            this.chatroomsLabel.TabIndex = 9;
-            this.chatroomsLabel.Text = "Chatrooms:";
-            this.chatroomsLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.reconnectToolStripMenuItem.Name = "reconnectToolStripMenuItem";
+            this.reconnectToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.reconnectToolStripMenuItem.Text = "Reconnect";
+            this.reconnectToolStripMenuItem.Click += new System.EventHandler(this.ToolStripReconnectClick);
+            // 
+            // disconnectToolStripMenuItem
+            // 
+            this.disconnectToolStripMenuItem.Name = "disconnectToolStripMenuItem";
+            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.disconnectToolStripMenuItem.Text = "Disconnect";
+            this.disconnectToolStripMenuItem.Click += new System.EventHandler(this.ToolStripDisconnectClick);
+            // 
+            // roomsToolStripMenuItem
+            // 
+            this.roomsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addToolStripMenuItem,
+            this.deleteToolStripMenuItem,
+            this.leaveToolStripMenuItem});
+            this.roomsToolStripMenuItem.Name = "roomsToolStripMenuItem";
+            this.roomsToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
+            this.roomsToolStripMenuItem.Text = "Rooms";
+            // 
+            // addToolStripMenuItem
+            // 
+            this.addToolStripMenuItem.Name = "addToolStripMenuItem";
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.addToolStripMenuItem.Text = "Add";
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            // 
+            // leaveToolStripMenuItem
+            // 
+            this.leaveToolStripMenuItem.Name = "leaveToolStripMenuItem";
+            this.leaveToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.leaveToolStripMenuItem.Text = "Leave";
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // messageBox
+            // 
+            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.messageBox.Location = new System.Drawing.Point(5, 5);
+            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
+            this.messageBox.Name = "messageBox";
+            this.messageBox.ReadOnly = true;
+            this.messageBox.Size = new System.Drawing.Size(438, 330);
+            this.messageBox.TabIndex = 6;
+            this.messageBox.TabStop = false;
+            this.messageBox.Text = "";
             // 
             // IRC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(819, 496);
-            this.Controls.Add(this.mainTableLayout);
+            this.ClientSize = new System.Drawing.Size(685, 409);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.IsMdiContainer = true;
+            this.KeyPreview = true;
+            this.MinimumSize = new System.Drawing.Size(600, 350);
             this.Name = "IRC";
             this.Text = "IRC";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.IRC_FormClosing);
             this.Load += new System.EventHandler(this.onIrcLoad);
-            this.mainTableLayout.ResumeLayout(false);
-            this.TableLayout.ResumeLayout(false);
-            this.TableLayout.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            this.mainTableLayout.ResumeLayout(false);
+            this.chatroomLayout.ResumeLayout(false);
+            this.chatroomLayout.PerformLayout();
+            this.TableLayout.ResumeLayout(false);
+            this.userlistLayout.ResumeLayout(false);
+            this.userlistLayout.PerformLayout();
+            this.menuStrip.ResumeLayout(false);
+            this.menuStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.TableLayoutPanel mainTableLayout;
-        private System.Windows.Forms.TextBox onlineUsersLabel;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.ListBox onlineUsersList;
-        private System.Windows.Forms.TableLayoutPanel TableLayout;
-        private lib.RichTextBoxEx messageBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.TableLayoutPanel mainTableLayout;
+        private System.Windows.Forms.TableLayoutPanel chatroomLayout;
         private System.Windows.Forms.ListBox chatroomList;
         private System.Windows.Forms.TextBox chatroomsLabel;
-        public System.Windows.Forms.TextBox inputField;
+        private System.Windows.Forms.TableLayoutPanel TableLayout;
+        private lib.RichTextBoxEx messageBox;
+        private System.Windows.Forms.RichTextBox inputTextBox;
+        private System.Windows.Forms.TableLayoutPanel userlistLayout;
+        private System.Windows.Forms.TextBox onlineUsersLabel;
+        private System.Windows.Forms.ListBox onlineUsersList;
+        private System.Windows.Forms.MenuStrip menuStrip;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem disconnectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem roomsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem leaveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reconnectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
     }
 }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
-using static ChatClient.lib.Routines;
+using ChatClient.lib;
 using static ChatLib.Interactions;
 
 namespace ChatClient
@@ -23,7 +23,14 @@ namespace ChatClient
         private void onIrcLoad(object sender, EventArgs e)
         {
             messageBox.AppendText("Ah shit, here we go again.");
+            messageBox.Focus();
             Task.Run(() => Connect());
+        }
+        public static void PrintToMessageBox(string message, RichTextBoxEx messageBox)
+        {
+            messageBox.BeginInvoke(new Action(() => messageBox.AppendText("\n" + message)));
+            messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
+            messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
         }
         private void Connect()
         {
@@ -31,6 +38,7 @@ namespace ChatClient
             {
                 client = new TcpClient(host, 1488);
                 stream = client.GetStream();
+                inputTextBox.BeginInvoke(new Action(() => inputTextBox.Enabled = true));
                 PrintToMessageBox("Connected to server. Please enter your nickname.", messageBox);
                 SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref client);
                 chatroomList.BeginInvoke(new Action(() => selectedRoom = chatroomList.SelectedIndex));
@@ -43,7 +51,7 @@ namespace ChatClient
         }
         private void SendChatMessage(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter && inputField.Text.Trim(' ').Length > 0)
+            if (e.KeyChar == (char)Keys.Enter && inputTextBox.Text.Trim(' ').Length > 0)
             {
                 try
                 {
@@ -52,21 +60,21 @@ namespace ChatClient
                     else
                     {
                         if (!loggedIn) {
-                            if (inputField.Text.Trim(' ').Length < 51)
+                            if (inputTextBox.Text.Trim(' ').Length < 51)
                             {
-                                SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, inputField.Text.Trim(' ')), ref client);
+                                SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, inputTextBox.Text.Trim(' ', '\n', '\r')), ref client);
                                 loggedIn = true;
                             }
                             else
                                 PrintToMessageBox("Nickname must be less than 51 characters.", messageBox);
                         }
                         else {
-                            if (inputField.Text.Trim(' ').Length < 948)
-                                SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, inputField.Text.Trim(' ')), ref client);
+                            if (inputTextBox.Text.Trim(' ').Length < 948)
+                                SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, inputTextBox.Text.Trim(' ', '\n', '\r')), ref client);
                             else
                                 PrintToMessageBox("Your message is way too long.", messageBox);
                         }
-                        inputField.Text = "";
+                        inputTextBox.Text = "";
                     }
                     e.Handled = true;
                 }
@@ -90,7 +98,7 @@ namespace ChatClient
                             SetListboxItems(chatroomList, message.list);
                             break;
                         case codes.CONFIRMING_USERNAME:
-                            BeginInvoke(new Action(() => Text = message.info + " - " + Text));
+                            BeginInvoke(new Action(() => Text = message.info + " - IRC"));
                             chatroomList.BeginInvoke(new Action(() => chatroomList.Enabled = true));
                             PrintToMessageBox("You logged in as " + message.info, messageBox);
                             break;
@@ -114,8 +122,9 @@ namespace ChatClient
             catch (Exception e)
             {
                 PrintToMessageBox("In GetNewMessages(): " + e.Message, messageBox);
-                PrintToMessageBox("Disconnected from server", messageBox);
                 Disconnect();
+                PrintToMessageBox("Disconnected from server", messageBox);
+                inputTextBox.Enabled = false;
             }
         }
         private void SetListboxItems(ListBox subj, List<string> list)
@@ -136,6 +145,21 @@ namespace ChatClient
                 selectedRoom = chatroomList.SelectedIndex;
             }
         }
+        private void ToolStripDisconnectClick(object sender, EventArgs e)
+        {
+            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
+            Disconnect();
+            loggedIn = false;
+            inputTextBox.Enabled = false;
+            Text = "IRC";
+            messageBox.AppendText("\nDisconnected from server");
+        }
+        private void ToolStripReconnectClick(object sender, EventArgs e)
+        {
+            messageBox.Clear();
+            messageBox.AppendText("Ah shit, here we go again.");
+            Connect();
+        }
         private void IRC_FormClosing(object sender, FormClosingEventArgs e)
         {
             SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
@@ -151,6 +175,12 @@ namespace ChatClient
                     client.Close();
             }
             catch { }
+        }
+
+        private void inputTextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                e.IsInputKey = true;
         }
     }
 }
