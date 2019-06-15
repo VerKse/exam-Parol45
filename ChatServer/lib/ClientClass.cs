@@ -10,8 +10,8 @@ namespace ChatServer.lib
     class ClientClass
     {
         protected internal int id { get; private set; }
-        protected internal string name { get; private set; }
-        protected internal MySqlConnection connection { get; private set; }
+        protected internal string name { get; set; }
+        protected internal MySqlConnection connection;
         public TcpClient client;
         public Room room;
         public ClientClass(ref MySqlConnection connection, ref TcpClient client, string name, int id)
@@ -44,6 +44,9 @@ namespace ChatServer.lib
                             break;
                         case codes.SENDING_SELECTED_ROOM:
                             ServerEngine.ChangeRoom(this, message.info);
+                            break;
+                        case codes.REQUESTING_NEW_ROOM:
+                            ServerEngine.AddRoom(ref connection, ref client, message.info);
                             break;
                         case codes.SENDING_DISCONNECT_MESSAGE:
                             Disconnect();

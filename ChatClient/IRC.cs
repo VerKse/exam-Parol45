@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,12 +24,16 @@ namespace ChatClient
         private void onIrcLoad(object sender, EventArgs e)
         {
             messageBox.AppendText("Ah shit, here we go again.");
-            messageBox.Focus();
+            menuStrip.BackColor = SystemColors.Control;
             Task.Run(() => Connect());
         }
-        public static void PrintToMessageBox(string message, RichTextBoxEx messageBox)
+        public void PrintToMessageBox(string message, RichTextBoxEx messageBox)
         {
             messageBox.BeginInvoke(new Action(() => messageBox.AppendText("\n" + message)));
+            ScrollToEnd(messageBox);
+        }
+        public void ScrollToEnd(RichTextBoxEx messageBox)
+        {
             messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
             messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
         }
@@ -38,10 +43,10 @@ namespace ChatClient
             {
                 client = new TcpClient(host, 1488);
                 stream = client.GetStream();
-                inputTextBox.BeginInvoke(new Action(() => inputTextBox.Enabled = true));
+                inputTextBox.BeginInvoke(new Action(() => { inputTextBox.Enabled = true; inputTextBox.Focus(); }));
                 PrintToMessageBox("Connected to server. Please enter your nickname.", messageBox);
                 SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref client);
-                chatroomList.BeginInvoke(new Action(() => selectedRoom = chatroomList.SelectedIndex));
+                chatroomList.BeginInvoke(new Action(() => selectedRoom = -1));
                 Task.Run(() => GetNewMessages());
             }
             catch (Exception e)
@@ -59,18 +64,27 @@ namespace ChatClient
                         Task.Run(() => Connect());
                     else
                     {
+                        string toSend = inputTextBox.Text.Trim(' ', '\r', '\n').Replace("\n", "").Replace("\r", "");
                         if (!loggedIn) {
-                            if (inputTextBox.Text.Trim(' ').Length < 51)
+                            if (toSend.Length < 51)
                             {
-                                SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, inputTextBox.Text.Trim(' ', '\n', '\r')), ref client);
-                                loggedIn = true;
+                                if (toSend.Length > 0)
+                                {
+                                    SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, toSend), ref client);
+                                    loggedIn = true;
+                                }
+                                else
+                                    PrintToMessageBox("Nickname must be at least 1 character", messageBox);
                             }
                             else
                                 PrintToMessageBox("Nickname must be less than 51 characters.", messageBox);
                         }
                         else {
-                            if (inputTextBox.Text.Trim(' ').Length < 948)
-                                SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, inputTextBox.Text.Trim(' ', '\n', '\r')), ref client);
+                            if (toSend.Length < 948)
+                                if (toSend.Length > 0)
+                                    SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, toSend), ref client);
+                                else
+                                    PrintToMessageBox("Your message is empty.", messageBox);
                             else
                                 PrintToMessageBox("Your message is way too long.", messageBox);
                         }
@@ -96,6 +110,7 @@ namespace ChatClient
                     {
                         case codes.SENDING_ROOMLIST:
                             SetListboxItems(chatroomList, message.list);
+                            chatroomList.BeginInvoke(new Action(() => chatroomList.SelectedIndex = selectedRoom));
                             break;
                         case codes.CONFIRMING_USERNAME:
                             BeginInvoke(new Action(() => Text = message.info + " - IRC"));
@@ -115,6 +130,9 @@ namespace ChatClient
                             break;
                         case codes.SENDING_BROADCAST_MESSAGE:
                             PrintToMessageBox(message.info, messageBox);
+                            break;
+                        case codes.EXISTING_ROOM_NAME:
+                            AddRoom();
                             break;
                     }
                 }
@@ -150,12 +168,13 @@ namespace ChatClient
             SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
             Disconnect();
             loggedIn = false;
+            chatroomList.Enabled = false;
             inputTextBox.Enabled = false;
             Text = "IRC";
-            messageBox.AppendText("\nDisconnected from server");
         }
         private void ToolStripReconnectClick(object sender, EventArgs e)
         {
+            ToolStripDisconnectClick(sender, e);
             messageBox.Clear();
             messageBox.AppendText("Ah shit, here we go again.");
             Connect();
@@ -181,6 +200,67 @@ namespace ChatClient
         {
             if (e.KeyCode == Keys.Enter)
                 e.IsInputKey = true;
+        }
+
+        private void setLightTheme(object sender, EventArgs e)
+        {
+            menuStrip.BackColor = SystemColors.Control;
+            menuStrip.ForeColor = SystemColors.WindowText;
+            BackColor = SystemColors.Control;
+            messageBox.BackColor = SystemColors.Window;
+            messageBox.ForeColor = SystemColors.WindowText;
+            onlineUsersList.BackColor = SystemColors.Window;
+            onlineUsersList.ForeColor = SystemColors.WindowText;
+            onlineUsersLabel.BackColor = SystemColors.Control;
+            onlineUsersLabel.ForeColor = SystemColors.WindowText;
+            chatroomList.BackColor = SystemColors.Window;
+            chatroomList.ForeColor = SystemColors.WindowText;
+            chatroomsLabel.BackColor = SystemColors.Control;
+            chatroomsLabel.ForeColor = SystemColors.WindowText;
+            inputTextBox.BackColor = SystemColors.Window;
+            inputTextBox.ForeColor = SystemColors.WindowText;
+        }
+
+        private void setDarkTheme(object sender, EventArgs e)
+        {
+            Color controlBackground = Color.FromArgb(40, 40, 40);
+            menuStrip.BackColor = SystemColors.ControlDarkDark;
+            menuStrip.ForeColor = Color.White;
+            BackColor = SystemColors.ControlDarkDark;
+            messageBox.BackColor = controlBackground;
+            messageBox.ForeColor = Color.White;
+            onlineUsersList.BackColor = controlBackground;
+            onlineUsersList.ForeColor = Color.White;
+            onlineUsersLabel.BackColor = Color.DarkGray;
+            onlineUsersLabel.ForeColor = Color.White;
+            chatroomList.BackColor = controlBackground;
+            chatroomList.ForeColor = Color.White;
+            chatroomsLabel.BackColor = Color.DarkGray;
+            chatroomsLabel.ForeColor = Color.White;
+            inputTextBox.BackColor = controlBackground;
+            inputTextBox.ForeColor = Color.White;
+        }
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            ActiveControl = null;
+        }
+        private void AddRoom()
+        {
+            BeginInvoke(new Action(() => {
+                NewRoomDialog meh = new NewRoomDialog(ref client);
+                meh.Show();
+            }));
+        }
+
+        private void ToolStripAddRoomClick(object sender, EventArgs e)
+        {
+            AddRoom();
+        }
+
+        private void OnRecize(object sender, EventArgs e)
+        {
+            ScrollToEnd(messageBox);
         }
     }
 }

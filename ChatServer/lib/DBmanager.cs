@@ -78,7 +78,7 @@ namespace ChatServer.lib
         public static void SaveMessage(string message, string roomName, ref MySqlConnection connection)
         {
             MySqlCommand query = connection.CreateCommand();
-            query.CommandText = "insert into `" + roomName + "_hist`(message, dt) values('" + message.Replace("'", "\"") + 
+            query.CommandText = "insert into `" + roomName + "_hist`(message, dt) values('" + MySqlHelper.EscapeString(message) + 
                 "', sysdate()); commit;";
             query.ExecuteNonQuery();
         }
@@ -86,13 +86,22 @@ namespace ChatServer.lib
         {
             List<string> hist = new List<string>();
             MySqlCommand query = connection.CreateCommand();
-            query.CommandText = "select concat(date_format(dt, '%H:%m:%s'),'  ||  ', message) from `" 
+            query.CommandText = "select concat(date_format(dt, '%H:%i:%s'),'  ||  ', message) from `" 
                 + roomName + "_hist` order by id;";
             MySqlDataReader selection = query.ExecuteReader();
             while (selection.Read())
                 hist.Add(selection.GetString(0));
             selection.Close();
             return hist;
+        }
+        public static void CreateNewRoom(ref MySqlConnection connection, string roomName)
+        {
+            MySqlCommand query = connection.CreateCommand();
+            query.CommandText = "insert into rooms(name) values ('" + MySqlHelper.EscapeString(roomName) + "');";
+            query.ExecuteNonQuery();
+            query.CommandText = "create table `" + roomName.Replace('`', '\'') + "_hist`(message nvarchar(1000) not null" +
+                    ", dt datetime(6) not null, id int not null auto_increment primary key);";
+            query.ExecuteNonQuery();
         }
     }
 }

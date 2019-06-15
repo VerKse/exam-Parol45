@@ -21,8 +21,11 @@ namespace ChatLib
             REQUESTING_ROOMLIST,
             REQUESTING_USERLIST,
             REQUESTING_CHAT_HIST,
+            REQUESTING_NEW_ROOM,
             REQUESTING_USERNAME,
-            CONFIRMING_USERNAME
+            CONFIRMING_USERNAME,
+            ROOM_CREATED,
+            EXISTING_ROOM_NAME
         }
         // Отправка в поток преобразованного в json объекта класса Message.
         public static void SendToStream(Message message, ref TcpClient client)

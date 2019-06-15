@@ -34,6 +34,7 @@
             this.chatroomList = new System.Windows.Forms.ListBox();
             this.chatroomsLabel = new System.Windows.Forms.TextBox();
             this.TableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.inputTextBox = new System.Windows.Forms.RichTextBox();
             this.userlistLayout = new System.Windows.Forms.TableLayoutPanel();
             this.onlineUsersLabel = new System.Windows.Forms.TextBox();
@@ -46,8 +47,11 @@
             this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.leaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.themeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.darkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.tableLayoutPanel1.SuspendLayout();
             this.mainTableLayout.SuspendLayout();
             this.chatroomLayout.SuspendLayout();
@@ -68,7 +72,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(685, 409);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(584, 336);
             this.tableLayoutPanel1.TabIndex = 2;
             // 
             // mainTableLayout
@@ -85,8 +89,8 @@
             this.mainTableLayout.Name = "mainTableLayout";
             this.mainTableLayout.RowCount = 1;
             this.mainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.mainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 378F));
-            this.mainTableLayout.Size = new System.Drawing.Size(679, 378);
+            this.mainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 305F));
+            this.mainTableLayout.Size = new System.Drawing.Size(578, 305);
             this.mainTableLayout.TabIndex = 1;
             // 
             // chatroomLayout
@@ -102,7 +106,7 @@
             this.chatroomLayout.RowCount = 2;
             this.chatroomLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.chatroomLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.chatroomLayout.Size = new System.Drawing.Size(115, 378);
+            this.chatroomLayout.Size = new System.Drawing.Size(98, 305);
             this.chatroomLayout.TabIndex = 4;
             // 
             // chatroomList
@@ -116,7 +120,7 @@
             this.chatroomList.Location = new System.Drawing.Point(5, 35);
             this.chatroomList.Margin = new System.Windows.Forms.Padding(5);
             this.chatroomList.Name = "chatroomList";
-            this.chatroomList.Size = new System.Drawing.Size(105, 338);
+            this.chatroomList.Size = new System.Drawing.Size(88, 265);
             this.chatroomList.TabIndex = 8;
             this.chatroomList.SelectedIndexChanged += new System.EventHandler(this.ChooseRoom);
             // 
@@ -127,7 +131,7 @@
             this.chatroomsLabel.Margin = new System.Windows.Forms.Padding(5);
             this.chatroomsLabel.Name = "chatroomsLabel";
             this.chatroomsLabel.ReadOnly = true;
-            this.chatroomsLabel.Size = new System.Drawing.Size(105, 20);
+            this.chatroomsLabel.Size = new System.Drawing.Size(88, 20);
             this.chatroomsLabel.TabIndex = 9;
             this.chatroomsLabel.Text = "Chatrooms:";
             this.chatroomsLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -139,23 +143,35 @@
             this.TableLayout.Controls.Add(this.messageBox, 0, 0);
             this.TableLayout.Controls.Add(this.inputTextBox, 0, 1);
             this.TableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TableLayout.Location = new System.Drawing.Point(115, 0);
+            this.TableLayout.Location = new System.Drawing.Point(98, 0);
             this.TableLayout.Margin = new System.Windows.Forms.Padding(0);
             this.TableLayout.Name = "TableLayout";
             this.TableLayout.RowCount = 2;
             this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 90F));
             this.TableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.TableLayout.Size = new System.Drawing.Size(448, 378);
+            this.TableLayout.Size = new System.Drawing.Size(381, 305);
             this.TableLayout.TabIndex = 0;
+            // 
+            // messageBox
+            // 
+            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.messageBox.Location = new System.Drawing.Point(5, 5);
+            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
+            this.messageBox.Name = "messageBox";
+            this.messageBox.ReadOnly = true;
+            this.messageBox.Size = new System.Drawing.Size(371, 264);
+            this.messageBox.TabIndex = 6;
+            this.messageBox.TabStop = false;
+            this.messageBox.Text = "";
             // 
             // inputTextBox
             // 
             this.inputTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.inputTextBox.Enabled = false;
-            this.inputTextBox.Location = new System.Drawing.Point(5, 345);
+            this.inputTextBox.Location = new System.Drawing.Point(5, 279);
             this.inputTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.inputTextBox.Name = "inputTextBox";
-            this.inputTextBox.Size = new System.Drawing.Size(438, 28);
+            this.inputTextBox.Size = new System.Drawing.Size(371, 21);
             this.inputTextBox.TabIndex = 7;
             this.inputTextBox.Text = "";
             this.inputTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendChatMessage);
@@ -168,13 +184,13 @@
             this.userlistLayout.Controls.Add(this.onlineUsersLabel, 0, 0);
             this.userlistLayout.Controls.Add(this.onlineUsersList, 0, 1);
             this.userlistLayout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.userlistLayout.Location = new System.Drawing.Point(563, 0);
+            this.userlistLayout.Location = new System.Drawing.Point(479, 0);
             this.userlistLayout.Margin = new System.Windows.Forms.Padding(0);
             this.userlistLayout.Name = "userlistLayout";
             this.userlistLayout.RowCount = 2;
             this.userlistLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.userlistLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.userlistLayout.Size = new System.Drawing.Size(116, 378);
+            this.userlistLayout.Size = new System.Drawing.Size(99, 305);
             this.userlistLayout.TabIndex = 1;
             // 
             // onlineUsersLabel
@@ -184,7 +200,7 @@
             this.onlineUsersLabel.Margin = new System.Windows.Forms.Padding(5);
             this.onlineUsersLabel.Name = "onlineUsersLabel";
             this.onlineUsersLabel.ReadOnly = true;
-            this.onlineUsersLabel.Size = new System.Drawing.Size(106, 20);
+            this.onlineUsersLabel.Size = new System.Drawing.Size(89, 20);
             this.onlineUsersLabel.TabIndex = 9;
             this.onlineUsersLabel.Text = "Users online:";
             this.onlineUsersLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -192,13 +208,12 @@
             // onlineUsersList
             // 
             this.onlineUsersList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.onlineUsersList.Enabled = false;
             this.onlineUsersList.FormattingEnabled = true;
             this.onlineUsersList.IntegralHeight = false;
             this.onlineUsersList.Location = new System.Drawing.Point(5, 35);
             this.onlineUsersList.Margin = new System.Windows.Forms.Padding(5);
             this.onlineUsersList.Name = "onlineUsersList";
-            this.onlineUsersList.Size = new System.Drawing.Size(106, 338);
+            this.onlineUsersList.Size = new System.Drawing.Size(89, 265);
             this.onlineUsersList.TabIndex = 8;
             // 
             // menuStrip
@@ -207,10 +222,11 @@
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.roomsToolStripMenuItem,
+            this.settingsToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(685, 24);
+            this.menuStrip.Size = new System.Drawing.Size(584, 24);
             this.menuStrip.TabIndex = 2;
             // 
             // fileToolStripMenuItem
@@ -251,6 +267,7 @@
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
             this.addToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.addToolStripMenuItem.Text = "Add";
+            this.addToolStripMenuItem.Click += new System.EventHandler(this.ToolStripAddRoomClick);
             // 
             // deleteToolStripMenuItem
             // 
@@ -264,37 +281,57 @@
             this.leaveToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.leaveToolStripMenuItem.Text = "Leave";
             // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.themeToolStripMenuItem});
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // themeToolStripMenuItem
+            // 
+            this.themeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lightToolStripMenuItem,
+            this.darkToolStripMenuItem});
+            this.themeToolStripMenuItem.Name = "themeToolStripMenuItem";
+            this.themeToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.themeToolStripMenuItem.Text = "Theme";
+            // 
+            // lightToolStripMenuItem
+            // 
+            this.lightToolStripMenuItem.Name = "lightToolStripMenuItem";
+            this.lightToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.lightToolStripMenuItem.Text = "Standart";
+            this.lightToolStripMenuItem.Click += new System.EventHandler(this.setLightTheme);
+            // 
+            // darkToolStripMenuItem
+            // 
+            this.darkToolStripMenuItem.Name = "darkToolStripMenuItem";
+            this.darkToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.darkToolStripMenuItem.Text = "Dark";
+            this.darkToolStripMenuItem.Click += new System.EventHandler(this.setDarkTheme);
+            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
             // 
-            // messageBox
-            // 
-            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.messageBox.Location = new System.Drawing.Point(5, 5);
-            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
-            this.messageBox.Name = "messageBox";
-            this.messageBox.ReadOnly = true;
-            this.messageBox.Size = new System.Drawing.Size(438, 330);
-            this.messageBox.TabIndex = 6;
-            this.messageBox.TabStop = false;
-            this.messageBox.Text = "";
-            // 
             // IRC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(685, 409);
+            this.ClientSize = new System.Drawing.Size(584, 336);
             this.Controls.Add(this.tableLayoutPanel1);
             this.IsMdiContainer = true;
             this.KeyPreview = true;
-            this.MinimumSize = new System.Drawing.Size(600, 350);
+            this.MinimumSize = new System.Drawing.Size(600, 375);
             this.Name = "IRC";
             this.Text = "IRC";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.IRC_FormClosing);
             this.Load += new System.EventHandler(this.onIrcLoad);
+            this.ResizeEnd += new System.EventHandler(this.OnRecize);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.mainTableLayout.ResumeLayout(false);
@@ -331,6 +368,10 @@
         private System.Windows.Forms.ToolStripMenuItem leaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reconnectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem themeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem lightToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem darkToolStripMenuItem;
     }
 }
 
