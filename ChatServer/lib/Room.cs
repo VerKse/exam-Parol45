@@ -12,7 +12,7 @@ namespace ChatServer.lib
     {
         public string name { get; private set; }
         public List<ClientClass> connectedUsers = new List<ClientClass>();
-        MySqlConnection connection = DBmanager.Connect();
+        public MySqlConnection connection = DBmanager.Connect();
         public Room(string name)
         {
             this.name = name;
@@ -33,7 +33,7 @@ namespace ChatServer.lib
             ClientClass client = connectedUsers.FirstOrDefault(i => i.id == id);
             if (client != null)
                 connectedUsers.Remove(client);
-            Task.Run(() => SendBroadcastMessage(client.name + " left the room.", connection));
+            SendBroadcastMessage(client.name + " left the room.", connection);
             connectedUsers.ForEach(user => SendToStream(new Message(codes.SENDING_USERLIST,
                 list: connectedUsers.Select(u => u.name).ToList()), ref user.client));
             Console.WriteLine(client.name + " left the " + name + " room. There are " + connectedUsers.Count + " connected users.");

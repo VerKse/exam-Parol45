@@ -34,7 +34,6 @@
             this.chatroomList = new System.Windows.Forms.ListBox();
             this.chatroomsLabel = new System.Windows.Forms.TextBox();
             this.TableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.inputTextBox = new System.Windows.Forms.RichTextBox();
             this.userlistLayout = new System.Windows.Forms.TableLayoutPanel();
             this.onlineUsersLabel = new System.Windows.Forms.TextBox();
@@ -52,6 +51,7 @@
             this.lightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.darkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.tableLayoutPanel1.SuspendLayout();
             this.mainTableLayout.SuspendLayout();
             this.chatroomLayout.SuspendLayout();
@@ -152,18 +152,6 @@
             this.TableLayout.Size = new System.Drawing.Size(381, 305);
             this.TableLayout.TabIndex = 0;
             // 
-            // messageBox
-            // 
-            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.messageBox.Location = new System.Drawing.Point(5, 5);
-            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
-            this.messageBox.Name = "messageBox";
-            this.messageBox.ReadOnly = true;
-            this.messageBox.Size = new System.Drawing.Size(371, 264);
-            this.messageBox.TabIndex = 6;
-            this.messageBox.TabStop = false;
-            this.messageBox.Text = "";
-            // 
             // inputTextBox
             // 
             this.inputTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -175,6 +163,7 @@
             this.inputTextBox.TabIndex = 7;
             this.inputTextBox.Text = "";
             this.inputTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendChatMessage);
+            this.inputTextBox.MouseHover += new System.EventHandler(this.inputTextBox_MouseHover);
             this.inputTextBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.inputTextBox_PreviewKeyDown);
             // 
             // userlistLayout
@@ -215,6 +204,7 @@
             this.onlineUsersList.Name = "onlineUsersList";
             this.onlineUsersList.Size = new System.Drawing.Size(89, 265);
             this.onlineUsersList.TabIndex = 8;
+            this.onlineUsersList.SelectedIndexChanged += new System.EventHandler(this.onlineUsersList_SelectedIndexChanged);
             // 
             // menuStrip
             // 
@@ -265,21 +255,23 @@
             // addToolStripMenuItem
             // 
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.addToolStripMenuItem.Text = "Add";
             this.addToolStripMenuItem.Click += new System.EventHandler(this.ToolStripAddRoomClick);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.ToolStripDeleteClick);
             // 
             // leaveToolStripMenuItem
             // 
             this.leaveToolStripMenuItem.Name = "leaveToolStripMenuItem";
-            this.leaveToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.leaveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.leaveToolStripMenuItem.Text = "Leave";
+            this.leaveToolStripMenuItem.Click += new System.EventHandler(this.ToolStripLeaveClick);
             // 
             // settingsToolStripMenuItem
             // 
@@ -318,6 +310,19 @@
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
             // 
+            // messageBox
+            // 
+            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.messageBox.Location = new System.Drawing.Point(5, 5);
+            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
+            this.messageBox.Name = "messageBox";
+            this.messageBox.ReadOnly = true;
+            this.messageBox.Size = new System.Drawing.Size(371, 264);
+            this.messageBox.TabIndex = 6;
+            this.messageBox.TabStop = false;
+            this.messageBox.Text = "";
+            this.messageBox.MouseHover += new System.EventHandler(this.messageBox_MouseHover);
+            // 
             // IRC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -331,7 +336,7 @@
             this.Text = "IRC";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.IRC_FormClosing);
             this.Load += new System.EventHandler(this.onIrcLoad);
-            this.ResizeEnd += new System.EventHandler(this.OnRecize);
+            this.SizeChanged += new System.EventHandler(this.OnRecize);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.mainTableLayout.ResumeLayout(false);

@@ -27,13 +27,9 @@ namespace ChatClient
             menuStrip.BackColor = SystemColors.Control;
             Task.Run(() => Connect());
         }
-        public void PrintToMessageBox(string message, RichTextBoxEx messageBox)
+        public void PrintToMessageBox(string message)
         {
             messageBox.BeginInvoke(new Action(() => messageBox.AppendText("\n" + message)));
-            ScrollToEnd(messageBox);
-        }
-        public void ScrollToEnd(RichTextBoxEx messageBox)
-        {
             messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
             messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
         }
@@ -43,15 +39,15 @@ namespace ChatClient
             {
                 client = new TcpClient(host, 1488);
                 stream = client.GetStream();
-                inputTextBox.BeginInvoke(new Action(() => { inputTextBox.Enabled = true; inputTextBox.Focus(); }));
-                PrintToMessageBox("Connected to server. Please enter your nickname.", messageBox);
+                inputTextBox.BeginInvoke(new Action(() => { inputTextBox.Enabled = true; inputTextBox.Select(); }));
+                PrintToMessageBox("Connected to server. Please enter your nickname.");
                 SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref client);
                 chatroomList.BeginInvoke(new Action(() => selectedRoom = -1));
                 Task.Run(() => GetNewMessages());
             }
             catch (Exception e)
             {
-                PrintToMessageBox("In Connect(): " + e.Message, messageBox);
+                PrintToMessageBox("In Connect(): " + e.Message);
             }
         }
         private void SendChatMessage(object sender, KeyPressEventArgs e)
@@ -74,19 +70,19 @@ namespace ChatClient
                                     loggedIn = true;
                                 }
                                 else
-                                    PrintToMessageBox("Nickname must be at least 1 character", messageBox);
+                                    PrintToMessageBox("Nickname must be at least 1 character");
                             }
                             else
-                                PrintToMessageBox("Nickname must be less than 51 characters.", messageBox);
+                                PrintToMessageBox("Nickname must be less than 51 characters.");
                         }
                         else {
                             if (toSend.Length < 948)
                                 if (toSend.Length > 0)
                                     SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, toSend), ref client);
                                 else
-                                    PrintToMessageBox("Your message is empty.", messageBox);
+                                    PrintToMessageBox("Your message is empty.");
                             else
-                                PrintToMessageBox("Your message is way too long.", messageBox);
+                                PrintToMessageBox("Your message is way too long.");
                         }
                         inputTextBox.Text = "";
                     }
@@ -94,7 +90,7 @@ namespace ChatClient
                 }
                 catch (Exception ex)
                 {
-                    PrintToMessageBox("In SendMessage(): " + ex.Message, messageBox);
+                    PrintToMessageBox("In SendMessage(): " + ex.Message);
                 }
             }
         }
@@ -115,10 +111,10 @@ namespace ChatClient
                         case codes.CONFIRMING_USERNAME:
                             BeginInvoke(new Action(() => Text = message.info + " - IRC"));
                             chatroomList.BeginInvoke(new Action(() => chatroomList.Enabled = true));
-                            PrintToMessageBox("You logged in as " + message.info, messageBox);
+                            PrintToMessageBox("You logged in as " + message.info);
                             break;
                         case codes.REQUESTING_USERNAME:
-                            PrintToMessageBox(message.info, messageBox);
+                            PrintToMessageBox(message.info);
                             loggedIn = false;
                             break;
                         case codes.SENDING_USERLIST:
@@ -126,10 +122,10 @@ namespace ChatClient
                             break;
                         case codes.SENDING_CHAT_HIST:
                             messageBox.BeginInvoke(new Action(() => messageBox.Text = "Welcome."));
-                            message.list.ForEach(mess => PrintToMessageBox(mess, messageBox));
+                            message.list.ForEach(mess => PrintToMessageBox(mess));
                             break;
                         case codes.SENDING_BROADCAST_MESSAGE:
-                            PrintToMessageBox(message.info, messageBox);
+                            PrintToMessageBox(message.info);
                             break;
                         case codes.EXISTING_ROOM_NAME:
                             AddRoom();
@@ -139,9 +135,9 @@ namespace ChatClient
             }
             catch (Exception e)
             {
-                PrintToMessageBox("In GetNewMessages(): " + e.Message, messageBox);
+                PrintToMessageBox("In GetNewMessages(): " + e.Message);
                 Disconnect();
-                PrintToMessageBox("Disconnected from server", messageBox);
+                PrintToMessageBox("Disconnected from server");
                 inputTextBox.Enabled = false;
             }
         }
@@ -160,6 +156,7 @@ namespace ChatClient
             if (chatroomList.SelectedIndex != selectedRoom)
             {
                 SendToStream(new ChatLib.Message(codes.SENDING_SELECTED_ROOM, chatroomList.SelectedItem.ToString()), ref client);
+                inputTextBox.Enabled = true;
                 selectedRoom = chatroomList.SelectedIndex;
             }
         }
@@ -179,29 +176,42 @@ namespace ChatClient
             messageBox.AppendText("Ah shit, here we go again.");
             Connect();
         }
-        private void IRC_FormClosing(object sender, FormClosingEventArgs e)
+        private void ToolStripAddRoomClick(object sender, EventArgs e)
         {
-            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
-            Disconnect();
+            AddRoom();
         }
-        static void Disconnect()
+        private void AddRoom()
         {
-            try
+            BeginInvoke(new Action(() => {
+                NewRoomDialog meh = new NewRoomDialog(ref client);
+                meh.Show();
+            }));
+        }
+        private void ToolStripDeleteClick(object sender, EventArgs e)
+        {
+            if (selectedRoom != -1)
             {
-                if (stream != null)
-                    stream.Close();
-                if (client != null)
-                    client.Close();
+                SendToStream(new ChatLib.Message(codes.REQUESTING_ROOM_DELETING), ref client);
+                GoToOpenSpace();
             }
-            catch { }
         }
-
-        private void inputTextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        private void ToolStripLeaveClick(object sender, EventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
-                e.IsInputKey = true;
+            if (selectedRoom != -1)
+            {
+                SendToStream(new ChatLib.Message(codes.LEAVING_ROOM), ref client);
+                GoToOpenSpace();
+            }
         }
-
+        private void GoToOpenSpace()
+        {
+            selectedRoom = -1;
+            chatroomList.SelectedIndex = -1;
+            onlineUsersList.Items.Clear();
+            messageBox.Clear();
+            messageBox.AppendText("Please select room.");
+            inputTextBox.Enabled = false;
+        }
         private void setLightTheme(object sender, EventArgs e)
         {
             menuStrip.BackColor = SystemColors.Control;
@@ -220,7 +230,6 @@ namespace ChatClient
             inputTextBox.BackColor = SystemColors.Window;
             inputTextBox.ForeColor = SystemColors.WindowText;
         }
-
         private void setDarkTheme(object sender, EventArgs e)
         {
             Color controlBackground = Color.FromArgb(40, 40, 40);
@@ -240,27 +249,48 @@ namespace ChatClient
             inputTextBox.BackColor = controlBackground;
             inputTextBox.ForeColor = Color.White;
         }
+        private void IRC_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
+            Disconnect();
+        }
+        static void Disconnect()
+        {
+            try
+            {
+                if (stream != null)
+                    stream.Close();
+                if (client != null)
+                    client.Close();
+            }
+            catch { }
+        }
+        private void inputTextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                e.IsInputKey = true;
+        }
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
             ActiveControl = null;
         }
-        private void AddRoom()
-        {
-            BeginInvoke(new Action(() => {
-                NewRoomDialog meh = new NewRoomDialog(ref client);
-                meh.Show();
-            }));
-        }
-
-        private void ToolStripAddRoomClick(object sender, EventArgs e)
-        {
-            AddRoom();
-        }
-
         private void OnRecize(object sender, EventArgs e)
         {
-            ScrollToEnd(messageBox);
+            messageBox.SelectionStart = messageBox.Text.Length - 1;
+            messageBox.ScrollToCaret();
+        }
+        private void messageBox_MouseHover(object sender, EventArgs e)
+        {
+            messageBox.Select();
+        }
+        private void inputTextBox_MouseHover(object sender, EventArgs e)
+        {
+            inputTextBox.Select();
+        }
+        private void onlineUsersList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            onlineUsersList.SelectedIndex = -1;
         }
     }
 }

@@ -99,8 +99,16 @@ namespace ChatServer.lib
             MySqlCommand query = connection.CreateCommand();
             query.CommandText = "insert into rooms(name) values ('" + MySqlHelper.EscapeString(roomName) + "');";
             query.ExecuteNonQuery();
-            query.CommandText = "create table `" + roomName.Replace('`', '\'') + "_hist`(message nvarchar(1000) not null" +
+            query.CommandText = "create table `" + MySqlHelper.EscapeString(roomName) + "_hist`(message nvarchar(1000) not null" +
                     ", dt datetime(6) not null, id int not null auto_increment primary key);";
+            query.ExecuteNonQuery();
+        }
+        public static void RemoveRoom(ref MySqlConnection connection, string roomName)
+        {
+            MySqlCommand query = connection.CreateCommand();
+            query.CommandText = "delete from rooms where name = '" + MySqlHelper.EscapeString(roomName) + "';";
+            query.ExecuteNonQuery();
+            query.CommandText = "drop table `" + MySqlHelper.EscapeString(roomName) + "_hist`;";
             query.ExecuteNonQuery();
         }
     }

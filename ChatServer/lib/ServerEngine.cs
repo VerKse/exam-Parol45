@@ -117,5 +117,11 @@ namespace ChatServer.lib
             else
                 SendToStream(new Message(codes.EXISTING_ROOM_NAME), ref client);
         }
+        public static void RemoveRoom(Room room)
+        {
+            rooms.Remove(room);
+            DBmanager.RemoveRoom(ref room.connection, room.name);
+            room.connection.Close();
+        }
     }
 }

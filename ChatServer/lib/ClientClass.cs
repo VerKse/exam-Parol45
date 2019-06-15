@@ -39,14 +39,40 @@ namespace ChatServer.lib
                             SendToStream(new Message(codes.SENDING_CHAT_HIST, list: DBmanager.GetHistory(name, connection)), ref client);
                             break;
                         case codes.SENDING_CHAT_MESSAGE:
-                            room.SendBroadcastMessage(name + ": " + message.info, connection);
-                            Console.WriteLine(name + ": " + message.info);
+                            if (room != null)
+                            {
+                                room.SendBroadcastMessage(name + ": " + message.info, connection);
+                                Console.WriteLine(name + ": " + message.info);
+                            }
                             break;
                         case codes.SENDING_SELECTED_ROOM:
-                            ServerEngine.ChangeRoom(this, message.info);
+                            if (room != null)
+                                ServerEngine.ChangeRoom(this, message.info);
+                            else
+                            {
+                                ServerEngine.unassignedUsers.Remove(this);
+                                ServerEngine.rooms.FirstOrDefault(r => r.name == message.info).AddClient(this);
+                            }
                             break;
                         case codes.REQUESTING_NEW_ROOM:
                             ServerEngine.AddRoom(ref connection, ref client, message.info);
+                            Console.WriteLine("Room " + message.info + " was added.");
+                            break;
+                        case codes.REQUESTING_ROOM_DELETING:
+                            if (room.connectedUsers.Count == 1 && room != null)
+                            {
+                                room.RemoveClient(id);
+                                ServerEngine.unassignedUsers.Add(this);
+                                ServerEngine.RemoveRoom(room);
+                                Console.WriteLine("Room " + room.name + " was deleted.");
+                                SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection)), ref client);
+                                room = null;
+                            }
+                            break;
+                        case codes.LEAVING_ROOM:
+                            room.RemoveClient(id);
+                            room = null;
+                            ServerEngine.unassignedUsers.Add(this);
                             break;
                         case codes.SENDING_DISCONNECT_MESSAGE:
                             Disconnect();

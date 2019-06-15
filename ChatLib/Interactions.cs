@@ -22,9 +22,10 @@ namespace ChatLib
             REQUESTING_USERLIST,
             REQUESTING_CHAT_HIST,
             REQUESTING_NEW_ROOM,
+            REQUESTING_ROOM_DELETING,
             REQUESTING_USERNAME,
             CONFIRMING_USERNAME,
-            ROOM_CREATED,
+            LEAVING_ROOM,
             EXISTING_ROOM_NAME
         }
         // Отправка в поток преобразованного в json объекта класса Message.
