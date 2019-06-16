@@ -164,7 +164,6 @@
             this.inputTextBox.Text = "";
             this.inputTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SendChatMessage);
             this.inputTextBox.MouseHover += new System.EventHandler(this.inputTextBox_MouseHover);
-            this.inputTextBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.inputTextBox_PreviewKeyDown);
             // 
             // userlistLayout
             // 

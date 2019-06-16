@@ -2,7 +2,9 @@
 
 namespace ChatLib
 {
-    // Класс, представляющий собой единицу передачи данных между клиентом и сервером.
+    /// <summary>
+    /// Класс, представляющий собой единицу передачи данных между клиентом и сервером
+    /// </summary>
     public class Message
     {
         public Interactions.codes code { get; private set; }

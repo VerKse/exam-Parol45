@@ -7,6 +7,9 @@ using static ChatLib.Interactions;
 
 namespace ChatServer.lib
 {
+    /// <summary>
+    /// Класс, описывающий взаимодействия пользователя с сервером
+    /// </summary>
     class ClientClass
     {
         protected internal int id { get; private set; }
@@ -21,7 +24,9 @@ namespace ChatServer.lib
             this.name = name;
             this.id = id;
         }
-        // Обработка получаемых от клиента пакетов.
+        /// <summary>
+        /// Обработка получаемых от клиента пакетов
+        /// </summary>
         public void Process()
         {
             try
@@ -93,7 +98,9 @@ namespace ChatServer.lib
                 Disconnect();
             }
         }
-        // Закрытие объектов, отвечающих за подключение.
+        /// <summary>
+        /// Закрытие объектов, отвечающих за подключение
+        /// </summary>
         public void Disconnect()
         {
             if (client != null)

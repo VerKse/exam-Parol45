@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using ChatLib;
 using static ChatLib.Interactions;
-
 namespace ChatServer.lib
 {
+    /// <summary>
+    /// Класс, описывающий поведение комнаты
+    /// </summary>
     class Room
     {
         public string name { get; private set; }
@@ -38,6 +40,11 @@ namespace ChatServer.lib
                 list: connectedUsers.Select(u => u.name).ToList()), ref user.client));
             Console.WriteLine(client.name + " left the " + name + " room. There are " + connectedUsers.Count + " connected users.");
         }
+        /// <summary>
+        /// Отправление всем пользователям комнаты сообщения
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="connection"></param>
         public void SendBroadcastMessage(string message, MySqlConnection connection)
         {
             DBmanager.SaveMessage(message, name, ref connection);

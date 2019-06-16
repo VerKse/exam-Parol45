@@ -16,6 +16,7 @@ namespace ChatClient
         static NetworkStream stream;
         string room = null;
         bool loggedIn = false;
+        bool inactive;
         public IRC()
         {
             InitializeComponent();
@@ -26,13 +27,22 @@ namespace ChatClient
             messageBox.AppendText("Ah shit, here we go again.");
             menuStrip.BackColor = SystemColors.Control;
             Task.Run(() => Connect());
+            Activated += delegate(object se, EventArgs ev) { inactive = false; };
+            Deactivate += delegate (object se, EventArgs ev) { inactive = true; };
         }
+        /// <summary>
+        /// Запись сообщения в messageBox из другого потока
+        /// </summary>
+        /// <param name="message"></param>
         public void PrintToMessageBox(string message)
         {
             messageBox.BeginInvoke(new Action(() => messageBox.AppendText("\n" + message)));
             messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
             messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
         }
+        /// <summary>
+        /// Подключение к серверу и дальнейший запуск ожидания входящих пакетов
+        /// </summary>
         private void Connect()
         {
             try
@@ -51,6 +61,11 @@ namespace ChatClient
                 PrintToMessageBox("Unable to connect to the server;");
             }
         }
+        /// <summary>
+        /// Отправка на сервер содержимого inputBox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SendChatMessage(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter && inputTextBox.Text.Trim(' ').Length > 0)
@@ -95,6 +110,9 @@ namespace ChatClient
                 }
             }
         }
+        /// <summary>
+        /// Бесконечный цикл с получением пакета с сервера
+        /// </summary>
         private void GetNewMessages()
         {
             ChatLib.Message message;
@@ -127,21 +145,27 @@ namespace ChatClient
                             break;
                         case codes.SENDING_BROADCAST_MESSAGE:
                             PrintToMessageBox(message.info);
+                            BeginInvoke(new Action(() => { if (inactive) PlaySound(); }));
                             break;
                         case codes.EXISTING_ROOM_NAME:
-                            AddRoom();
+                            AddRoom("Room already exists");
                             break;
                     }
                 }
             }
             catch (Exception e)
             {
-                // PrintToMessageBox("In GetNewMessages(): " + e.Message);
+                PrintToMessageBox("In GetNewMessages(): " + e.Message);
                 Disconnect();
                 PrintToMessageBox("Disconnected from server");
                 inputTextBox.Enabled = false;
             }
         }
+        /// <summary>
+        /// Обновление всего содержимого в ListBox
+        /// </summary>
+        /// <param name="subj"></param>
+        /// <param name="list"></param>
         private void SetListboxItems(ListBox subj, List<string> list)
         {
             IAsyncResult resultUserlist = subj.BeginInvoke(new Action(() => subj.Items.Clear()));
@@ -152,6 +176,9 @@ namespace ChatClient
                 subj.EndInvoke(resultUserlist);
             }
         }
+        /// <summary>
+        /// Сохранение текущего выделения в chatroomList по названию комнаты
+        /// </summary>
         private void UpdateListboxSelection()
         {
             for (int i = 0; i < chatroomList.Items.Count; i++)
@@ -173,6 +200,22 @@ namespace ChatClient
                 UpdateListboxSelection();
             }
         }
+        /// <summary>
+        /// Воспроизведение звука уведомления.
+        /// </summary>
+        private void PlaySound()
+        {
+            try
+            {
+                SoundPlayer notification = new SoundPlayer("notification.wav");
+                notification.Play();
+            }
+            catch (Exception e)
+            {
+                PrintToMessageBox(e.Message);
+                PrintToMessageBox("Unable to find \"notification.wav\"");
+            }
+        }
         private void ToolStripDisconnectClick(object sender, EventArgs e)
         {
             SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
@@ -182,6 +225,9 @@ namespace ChatClient
             inputTextBox.Enabled = false;
             Text = "IRC";
         }
+        /// <summary>
+        /// Закрытие всех объектов, отвечающих за подключение 
+        /// </summary>
         static void Disconnect()
         {
             try
@@ -204,10 +250,14 @@ namespace ChatClient
         {
             AddRoom();
         }
-        private void AddRoom()
+        /// <summary>
+        /// Открытие диалогового окна со вводом имени новой комнаты
+        /// </summary>
+        /// <param name="title"></param>
+        private void AddRoom(string title = "Enter room name")
         {
             BeginInvoke(new Action(() => {
-                NewRoomDialog meh = new NewRoomDialog(ref client);
+                NewRoomDialog meh = new NewRoomDialog(ref client, title);
                 meh.Show();
             }));
         }
@@ -227,6 +277,9 @@ namespace ChatClient
                 GoToOpenSpace();
             }
         }
+        /// <summary>
+        /// Выход в "пространство" вне комнат
+        /// </summary>
         private void GoToOpenSpace()
         {
             room = null;
@@ -278,11 +331,7 @@ namespace ChatClient
             SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
             Disconnect();
         }
-        private void inputTextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-                e.IsInputKey = true;
-        }
+        // Чтобы убирать глупое выделение
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);

@@ -7,7 +7,9 @@ namespace ChatLib
 {
     public static class Interactions
     {
-        // Унифицированный формат кодов для "общения" клиента и сервера.
+        /// <summary>
+        /// Унифицированный формат кодов для "общения" клиента и сервера
+        /// </summary>
         public enum codes
         {
             SENDING_USERNAME,
@@ -28,7 +30,11 @@ namespace ChatLib
             LEAVING_ROOM,
             EXISTING_ROOM_NAME
         }
-        // Отправка в поток преобразованного в json объекта класса Message.
+        /// <summary>
+        /// Отправка в поток преобразованного в json объекта класса Message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="client"></param>
         public static void SendToStream(Message message, ref TcpClient client)
         {
             try
@@ -45,7 +51,11 @@ namespace ChatLib
                     client.Close();
             }
         }
-        // Получение сообщения из потока и его расшифровка из jsona в объект класса Message.
+        /// <summary>
+        /// Получение сообщения из потока и его расшифровка из jsona в объект класса Message
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
         public static Message GetFromStream(ref TcpClient client)
         {
             NetworkStream stream = client.GetStream();

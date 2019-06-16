@@ -4,12 +4,18 @@ using MySql.Data.MySqlClient;
 
 namespace ChatServer.lib
 {
+    /// <summary>
+    /// Класс с методами взаимодействия с БД
+    /// </summary>
     static class DBmanager
     {
         const string host = "localhost";
         const string user = "client";
         const string password = "12345a";
         public static string connectionString = "Datasource=" + host + ";User=" + user + ";Password=" + password + ";charset=utf8";
+        /// <summary>
+        /// Проверка при включении, что всё на месте
+        /// </summary>
         public static void Initialize()
         {
             MySqlConnection connection = new MySqlConnection(connectionString);
@@ -55,6 +61,10 @@ namespace ChatServer.lib
             }
             connection.Close();
         }
+        /// <summary>
+        /// Создание подключения к БД
+        /// </summary>
+        /// <returns></returns>
         public static MySqlConnection Connect()
         {
             MySqlConnection connection = new MySqlConnection(connectionString);
@@ -64,6 +74,11 @@ namespace ChatServer.lib
             query.ExecuteNonQuery();
             return connection;
         }
+        /// <summary>
+        /// Выборка всех существующих комнат
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <returns></returns>
         public static List<string> GetRoomList(MySqlConnection connection)
         {
             List<string> result = new List<string>();
@@ -75,6 +90,12 @@ namespace ChatServer.lib
             roomlist.Close();
             return result;
         }
+        /// <summary>
+        /// Запись сообщения в историю сообщений комнаты
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="roomName"></param>
+        /// <param name="connection"></param>
         public static void SaveMessage(string message, string roomName, ref MySqlConnection connection)
         {
             MySqlCommand query = connection.CreateCommand();
@@ -82,6 +103,12 @@ namespace ChatServer.lib
                 "', sysdate()); commit;";
             query.ExecuteNonQuery();
         }
+        /// <summary>
+        /// Выборка истории сообщений комнаты
+        /// </summary>
+        /// <param name="roomName"></param>
+        /// <param name="connection"></param>
+        /// <returns></returns>
         public static List<string> GetHistory(string roomName, MySqlConnection connection)
         {
             List<string> hist = new List<string>();
@@ -94,6 +121,11 @@ namespace ChatServer.lib
             selection.Close();
             return hist;
         }
+        /// <summary>
+        /// Создание таблиц для комнаты
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="roomName"></param>
         public static void CreateNewRoom(ref MySqlConnection connection, string roomName)
         {
             MySqlCommand query = connection.CreateCommand();
@@ -103,6 +135,11 @@ namespace ChatServer.lib
                     ", dt datetime(6) not null, id int not null auto_increment primary key);";
             query.ExecuteNonQuery();
         }
+        /// <summary>
+        /// Удаление объектов комнаты
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="roomName"></param>
         public static void RemoveRoom(ref MySqlConnection connection, string roomName)
         {
             MySqlCommand query = connection.CreateCommand();

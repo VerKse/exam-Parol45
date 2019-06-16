@@ -8,10 +8,10 @@ namespace ChatServer
         // TODO: шифрование.
         // TODO: регистрация пользователей в бд.
         // TODO: ещё одна форма для входа.
-        // TODO: звук прихода сообщения.
+        // TODO: переписать под эвенты.
         static void Main(string[] args)
         {
-            Console.WriteLine("ver 0.3.5");
+            Console.WriteLine("ver 0.3.6");
             // Создаём возможно отсутствующие объекты в бд.
             DBmanager.Initialize();
             // Ждём пользователей в бесконечном цикле.

@@ -128,6 +128,7 @@
             this.roomName.Name = "roomName";
             this.roomName.Size = new System.Drawing.Size(150, 20);
             this.roomName.TabIndex = 0;
+            this.roomName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.roomName_KeyPress);
             // 
             // NewRoomDialog
             // 
