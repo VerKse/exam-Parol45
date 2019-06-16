@@ -17,7 +17,7 @@ namespace ChatServer.lib
     {
         static int idForNextUser = 0;
         static TcpListener listener;
-        public static List<Room> rooms = new List<Room>();
+        public static List<RoomClass> rooms = new List<RoomClass>();
         public static List<string> existingNicknames = new List<string>();
         public static List<ClientClass> unassignedUsers = new List<ClientClass>();
         /// <summary>
@@ -43,7 +43,7 @@ namespace ChatServer.lib
             }
         }
         /// <summary>
-        /// Начальная обработка пользователя после подключения
+        /// Создание задачи и объекта для пользователя после его подключения
         /// </summary>
         /// <param name="client"></param>
         private static void CreateUser(ref TcpClient client)
@@ -74,22 +74,22 @@ namespace ChatServer.lib
             if (rooms.FirstOrDefault(r => 0 == string.Compare(r.name, roomName, true)) == null)
             {
                 DBmanager.CreateNewRoom(ref connection, roomName);
-                rooms.Add(new Room(roomName));
+                rooms.Add(new RoomClass(roomName));
                 List<string> roomList = DBmanager.GetRoomList(connection);
                 unassignedUsers.ForEach(user =>
-                SendToStream(new Message(codes.SENDING_ROOMLIST, list: roomList), ref user.client));
+                SendToStream(new MessageClass(codes.SENDING_ROOMLIST, list: roomList), ref user.client));
                 rooms.ForEach(room => room.connectedUsers.ForEach(user =>
-                SendToStream(new Message(codes.SENDING_ROOMLIST, list: roomList), ref user.client)));
+                SendToStream(new MessageClass(codes.SENDING_ROOMLIST, list: roomList), ref user.client)));
                 Console.WriteLine("Room " + roomName + " is created.");
             }
             else
-                SendToStream(new Message(codes.EXISTING_ROOM_NAME), ref client);
+                SendToStream(new MessageClass(codes.EXISTING_ROOM_NAME), ref client);
         }
         /// <summary>
         /// Удаление комнаты из коллекции и закрытие подключения к БД
         /// </summary>
         /// <param name="room"></param>
-        public static void RemoveRoom(Room room)
+        public static void RemoveRoom(RoomClass room)
         {
             rooms.Remove(room);
             DBmanager.RemoveRoom(ref room.connection, room.name);

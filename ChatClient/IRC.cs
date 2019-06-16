@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
+using ChatLib;
 using static ChatLib.Interactions;
 
 namespace ChatClient
@@ -37,7 +38,7 @@ namespace ChatClient
         public void PrintToMessageBox(string message)
         {
             messageBox.BeginInvoke(new Action(() => messageBox.AppendText("\n" + message)));
-            messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length - 1));
+            messageBox.BeginInvoke(new Action(() => messageBox.SelectionStart = messageBox.Text.Length));
             messageBox.BeginInvoke(new Action(() => messageBox.ScrollToCaret()));
         }
         /// <summary>
@@ -51,7 +52,7 @@ namespace ChatClient
                 stream = client.GetStream();
                 inputTextBox.BeginInvoke(new Action(() => { inputTextBox.Enabled = true; inputTextBox.Select(); }));
                 PrintToMessageBox("Connected to server. Please enter your nickname.");
-                SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref client);
+                SendToStream(new MessageClass(codes.REQUESTING_ROOMLIST), ref client);
                 chatroomList.BeginInvoke(new Action(() => { chatroomList.SelectedIndex = -1; room = null; }));
                 Task.Run(() => GetNewMessages());
             }
@@ -82,7 +83,7 @@ namespace ChatClient
                             {
                                 if (toSend.Length > 0)
                                 {
-                                    SendToStream(new ChatLib.Message(codes.SENDING_USERNAME, toSend), ref client);
+                                    SendToStream(new MessageClass(codes.SENDING_USERNAME, toSend), ref client);
                                     loggedIn = true;
                                 }
                                 else
@@ -94,7 +95,7 @@ namespace ChatClient
                         else {
                             if (toSend.Length < 948)
                                 if (toSend.Length > 0)
-                                    SendToStream(new ChatLib.Message(codes.SENDING_CHAT_MESSAGE, toSend), ref client);
+                                    SendToStream(new MessageClass(codes.SENDING_CHAT_MESSAGE, toSend), ref client);
                                 else
                                     PrintToMessageBox("Your message is empty.");
                             else
@@ -115,7 +116,7 @@ namespace ChatClient
         /// </summary>
         private void GetNewMessages()
         {
-            ChatLib.Message message;
+            MessageClass message;
             try
             {
                 while (true)
@@ -168,13 +169,9 @@ namespace ChatClient
         /// <param name="list"></param>
         private void SetListboxItems(ListBox subj, List<string> list)
         {
-            IAsyncResult resultUserlist = subj.BeginInvoke(new Action(() => subj.Items.Clear()));
-            onlineUsersList.EndInvoke(resultUserlist);
+            subj.Invoke(new Action(() => subj.Items.Clear()));
             for (int i = 0; i < list.Count; i++)
-            {
-                resultUserlist = subj.BeginInvoke(new Action(() => subj.Items.Add(list[i])));
-                subj.EndInvoke(resultUserlist);
-            }
+                subj.Invoke(new Action(() => subj.Items.Add(list[i])));
         }
         /// <summary>
         /// Сохранение текущего выделения в chatroomList по названию комнаты
@@ -182,19 +179,17 @@ namespace ChatClient
         private void UpdateListboxSelection()
         {
             for (int i = 0; i < chatroomList.Items.Count; i++)
-            {
                 if (string.Compare(chatroomList.Items[i].ToString(), room, true) == 0)
                 {
                     chatroomList.BeginInvoke(new Action(() => chatroomList.SelectedIndex = i));
                     break;
                 }
-            }
         }
         private void ChooseRoom(object sender, EventArgs e)
         {
             if (chatroomList.SelectedIndex != -1 && chatroomList.SelectedItem.ToString() != room)
             {
-                SendToStream(new ChatLib.Message(codes.SENDING_SELECTED_ROOM, chatroomList.SelectedItem.ToString()), ref client);
+                SendToStream(new MessageClass(codes.SENDING_SELECTED_ROOM, chatroomList.SelectedItem.ToString()), ref client);
                 inputTextBox.Enabled = true;
                 room = chatroomList.SelectedItem.ToString();
                 UpdateListboxSelection();
@@ -218,7 +213,7 @@ namespace ChatClient
         }
         private void ToolStripDisconnectClick(object sender, EventArgs e)
         {
-            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
+            SendToStream(new MessageClass(codes.SENDING_DISCONNECT_MESSAGE), ref client);
             Disconnect();
             loggedIn = false;
             chatroomList.Enabled = false;
@@ -265,7 +260,7 @@ namespace ChatClient
         {
             if (room != null)
             {
-                SendToStream(new ChatLib.Message(codes.REQUESTING_ROOM_DELETING), ref client);
+                SendToStream(new MessageClass(codes.REQUESTING_ROOM_DELETING), ref client);
                 GoToOpenSpace();
             }
         }
@@ -273,7 +268,7 @@ namespace ChatClient
         {
             if (room != null)
             {
-                SendToStream(new ChatLib.Message(codes.LEAVING_ROOM), ref client);
+                SendToStream(new MessageClass(codes.LEAVING_ROOM), ref client);
                 GoToOpenSpace();
             }
         }
@@ -328,7 +323,7 @@ namespace ChatClient
         }
         private void IRC_FormClosing(object sender, FormClosingEventArgs e)
         {
-            SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
+            SendToStream(new MessageClass(codes.SENDING_DISCONNECT_MESSAGE), ref client);
             Disconnect();
         }
         // Чтобы убирать глупое выделение
@@ -339,7 +334,7 @@ namespace ChatClient
         }
         private void OnSizeChanged(object sender, EventArgs e)
         {
-            messageBox.SelectionStart = messageBox.Text.Length - 1;
+            messageBox.SelectionStart = messageBox.Text.Length;
             messageBox.ScrollToCaret();
         }
         private void messageBox_MouseHover(object sender, EventArgs e)

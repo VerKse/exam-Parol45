@@ -16,7 +16,7 @@ namespace ChatServer.lib
         protected internal string name { get; set; }
         protected internal MySqlConnection connection;
         public TcpClient client;
-        public Room room;
+        public RoomClass room;
         public ClientClass(ref MySqlConnection connection, ref TcpClient client, string name, int id)
         {
             this.connection = connection;
@@ -31,31 +31,31 @@ namespace ChatServer.lib
         {
             try
             {
-                Message message;
+                MessageClass message;
                 while (true)
                 {
                     message = GetFromStream(ref client);
                     switch (message.code)
                     {
                         case codes.REQUESTING_ROOMLIST:
-                            SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection)), ref client);
+                            SendToStream(new MessageClass(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection)), ref client);
                             break;
                         case codes.SENDING_USERNAME:
                             if (ServerEngine.existingNicknames.FirstOrDefault(n => n == message.info) == null)
                             {
                                 name = message.info;
                                 ServerEngine.existingNicknames.Add(name);
-                                SendToStream(new Message(codes.CONFIRMING_USERNAME, name), ref client);
+                                SendToStream(new MessageClass(codes.CONFIRMING_USERNAME, name), ref client);
                                 Console.WriteLine("User " + name + " logged in.");
                             }
                             else
                             {
-                                SendToStream(new Message(codes.REQUESTING_USERNAME,
+                                SendToStream(new MessageClass(codes.REQUESTING_USERNAME,
                                     "There is user witn nickname \"" + message.info + "\" already"), ref client);
                             }
                             break;
                         case codes.REQUESTING_CHAT_HIST:
-                            SendToStream(new Message(codes.SENDING_CHAT_HIST, list: DBmanager.GetHistory(name, connection)), ref client);
+                            SendToStream(new MessageClass(codes.SENDING_CHAT_HIST, list: DBmanager.GetHistory(name, connection)), ref client);
                             break;
                         case codes.SENDING_CHAT_MESSAGE:
                             if (room != null)
@@ -84,7 +84,7 @@ namespace ChatServer.lib
                                 ServerEngine.unassignedUsers.Add(this);
                                 ServerEngine.RemoveRoom(room);
                                 Console.WriteLine("Room " + room.name + " was deleted.");
-                                SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection)), ref client);
+                                SendToStream(new MessageClass(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection)), ref client);
                                 room = null;
                             }
                             break;

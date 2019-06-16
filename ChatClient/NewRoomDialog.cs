@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Windows.Forms;
+using ChatLib;
 using static ChatLib.Interactions;
 
 namespace ChatClient
@@ -19,7 +20,7 @@ namespace ChatClient
             string toSend = roomName.Text.Trim(' ');
             if (toSend.Length > 0)
             {
-                SendToStream(new ChatLib.Message(codes.REQUESTING_NEW_ROOM, toSend), ref client);
+                SendToStream(new MessageClass(codes.REQUESTING_NEW_ROOM, toSend), ref client);
                 Close();
             }
         }
@@ -33,7 +34,8 @@ namespace ChatClient
         }
         private void BanQuotes(object sender, EventArgs e)
         {
-            roomName.Text = roomName.Text.Trim('`');
+            roomName.Text = roomName.Text.Replace("`", "");
+            roomName.SelectionStart = roomName.Text.Length;
         }
     }
 }

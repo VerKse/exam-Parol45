@@ -35,7 +35,7 @@ namespace ChatLib
         /// </summary>
         /// <param name="message"></param>
         /// <param name="client"></param>
-        public static void SendToStream(Message message, ref TcpClient client)
+        public static void SendToStream(MessageClass message, ref TcpClient client)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace ChatLib
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        public static Message GetFromStream(ref TcpClient client)
+        public static MessageClass GetFromStream(ref TcpClient client)
         {
             NetworkStream stream = client.GetStream();
             StringBuilder builder = new StringBuilder();
@@ -76,7 +76,7 @@ namespace ChatLib
                 }
             }
             while (toGet == 0 || toGet > got);
-            return JsonConvert.DeserializeObject<Message>(builder.ToString().Substring(from));
+            return JsonConvert.DeserializeObject<MessageClass>(builder.ToString().Substring(from));
         }
     }
 }

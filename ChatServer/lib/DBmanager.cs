@@ -45,7 +45,7 @@ namespace ChatServer.lib
                         " dt datetime(6) not null, id int not null auto_increment primary key);";
                     initializator.ExecuteNonQuery();
                     Console.Write(chatRooms[i] + (i == chatRooms.Count - 1 ? "" : ", "));
-                    ServerEngine.rooms.Add(new Room(chatRooms[i]));
+                    ServerEngine.rooms.Add(new RoomClass(chatRooms[i]));
                 }
                 Console.WriteLine(".");
             }
