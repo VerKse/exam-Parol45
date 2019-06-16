@@ -86,7 +86,10 @@ namespace ChatServer.lib
             catch (Exception e)
             {
                 Console.WriteLine("In Process(): " + e.Message);
-                Console.WriteLine(name + " left the room.");
+                if (room != null)
+                    Console.WriteLine(name + " left the room.");
+                else
+                    Console.WriteLine(name + " disconnected.");
                 Disconnect();
             }
         }
@@ -97,7 +100,10 @@ namespace ChatServer.lib
                 client.Close();
             connection.Close();
             ServerEngine.existingNicknames.Remove(name);
-            room.RemoveClient(id);
+            if (room != null)
+                room.RemoveClient(id);
+            else
+                Console.WriteLine(name + " disconnected.");
         }
     }
 }

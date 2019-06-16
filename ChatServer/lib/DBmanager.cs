@@ -68,7 +68,7 @@ namespace ChatServer.lib
         {
             List<string> result = new List<string>();
             MySqlCommand query = connection.CreateCommand();
-            query.CommandText = "select name from rooms;";
+            query.CommandText = "select name from rooms order by name;";
             MySqlDataReader roomlist = query.ExecuteReader();
             while (roomlist.Read())
                 result.Add(roomlist.GetString(0));

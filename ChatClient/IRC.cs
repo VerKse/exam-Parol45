@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Media;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net.Sockets;
-using ChatClient.lib;
 using static ChatLib.Interactions;
 
 namespace ChatClient
@@ -14,7 +14,7 @@ namespace ChatClient
         private const string host = "46.173.214.207";
         static TcpClient client;
         static NetworkStream stream;
-        int selectedRoom;
+        string room = null;
         bool loggedIn = false;
         public IRC()
         {
@@ -42,12 +42,13 @@ namespace ChatClient
                 inputTextBox.BeginInvoke(new Action(() => { inputTextBox.Enabled = true; inputTextBox.Select(); }));
                 PrintToMessageBox("Connected to server. Please enter your nickname.");
                 SendToStream(new ChatLib.Message(codes.REQUESTING_ROOMLIST), ref client);
-                chatroomList.BeginInvoke(new Action(() => selectedRoom = -1));
+                chatroomList.BeginInvoke(new Action(() => { chatroomList.SelectedIndex = -1; room = null; }));
                 Task.Run(() => GetNewMessages());
             }
             catch (Exception e)
             {
-                PrintToMessageBox("In Connect(): " + e.Message);
+                //PrintToMessageBox("In Connect(): " + e.Message);
+                PrintToMessageBox("Unable to connect to the server;");
             }
         }
         private void SendChatMessage(object sender, KeyPressEventArgs e)
@@ -70,10 +71,10 @@ namespace ChatClient
                                     loggedIn = true;
                                 }
                                 else
-                                    PrintToMessageBox("Nickname must be at least 1 character");
+                                    PrintToMessageBox("Nickname must be at least 1 character long.");
                             }
                             else
-                                PrintToMessageBox("Nickname must be less than 51 characters.");
+                                PrintToMessageBox("Nickname must be less than 51 characters long.");
                         }
                         else {
                             if (toSend.Length < 948)
@@ -90,7 +91,7 @@ namespace ChatClient
                 }
                 catch (Exception ex)
                 {
-                    PrintToMessageBox("In SendMessage(): " + ex.Message);
+                    //PrintToMessageBox("In SendMessage(): " + ex.Message);
                 }
             }
         }
@@ -106,7 +107,7 @@ namespace ChatClient
                     {
                         case codes.SENDING_ROOMLIST:
                             SetListboxItems(chatroomList, message.list);
-                            chatroomList.BeginInvoke(new Action(() => chatroomList.SelectedIndex = selectedRoom));
+                            UpdateListboxSelection();
                             break;
                         case codes.CONFIRMING_USERNAME:
                             BeginInvoke(new Action(() => Text = message.info + " - IRC"));
@@ -135,7 +136,7 @@ namespace ChatClient
             }
             catch (Exception e)
             {
-                PrintToMessageBox("In GetNewMessages(): " + e.Message);
+                // PrintToMessageBox("In GetNewMessages(): " + e.Message);
                 Disconnect();
                 PrintToMessageBox("Disconnected from server");
                 inputTextBox.Enabled = false;
@@ -151,13 +152,25 @@ namespace ChatClient
                 subj.EndInvoke(resultUserlist);
             }
         }
+        private void UpdateListboxSelection()
+        {
+            for (int i = 0; i < chatroomList.Items.Count; i++)
+            {
+                if (string.Compare(chatroomList.Items[i].ToString(), room, true) == 0)
+                {
+                    chatroomList.BeginInvoke(new Action(() => chatroomList.SelectedIndex = i));
+                    break;
+                }
+            }
+        }
         private void ChooseRoom(object sender, EventArgs e)
         {
-            if (chatroomList.SelectedIndex != selectedRoom)
+            if (chatroomList.SelectedIndex != -1 && chatroomList.SelectedItem.ToString() != room)
             {
                 SendToStream(new ChatLib.Message(codes.SENDING_SELECTED_ROOM, chatroomList.SelectedItem.ToString()), ref client);
                 inputTextBox.Enabled = true;
-                selectedRoom = chatroomList.SelectedIndex;
+                room = chatroomList.SelectedItem.ToString();
+                UpdateListboxSelection();
             }
         }
         private void ToolStripDisconnectClick(object sender, EventArgs e)
@@ -168,6 +181,17 @@ namespace ChatClient
             chatroomList.Enabled = false;
             inputTextBox.Enabled = false;
             Text = "IRC";
+        }
+        static void Disconnect()
+        {
+            try
+            {
+                if (stream != null)
+                    stream.Close();
+                if (client != null)
+                    client.Close();
+            }
+            catch { }
         }
         private void ToolStripReconnectClick(object sender, EventArgs e)
         {
@@ -189,7 +213,7 @@ namespace ChatClient
         }
         private void ToolStripDeleteClick(object sender, EventArgs e)
         {
-            if (selectedRoom != -1)
+            if (room != null)
             {
                 SendToStream(new ChatLib.Message(codes.REQUESTING_ROOM_DELETING), ref client);
                 GoToOpenSpace();
@@ -197,7 +221,7 @@ namespace ChatClient
         }
         private void ToolStripLeaveClick(object sender, EventArgs e)
         {
-            if (selectedRoom != -1)
+            if (room != null)
             {
                 SendToStream(new ChatLib.Message(codes.LEAVING_ROOM), ref client);
                 GoToOpenSpace();
@@ -205,7 +229,7 @@ namespace ChatClient
         }
         private void GoToOpenSpace()
         {
-            selectedRoom = -1;
+            room = null;
             chatroomList.SelectedIndex = -1;
             onlineUsersList.Items.Clear();
             messageBox.Clear();
@@ -253,17 +277,6 @@ namespace ChatClient
         {
             SendToStream(new ChatLib.Message(codes.SENDING_DISCONNECT_MESSAGE), ref client);
             Disconnect();
-        }
-        static void Disconnect()
-        {
-            try
-            {
-                if (stream != null)
-                    stream.Close();
-                if (client != null)
-                    client.Close();
-            }
-            catch { }
         }
         private void inputTextBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
