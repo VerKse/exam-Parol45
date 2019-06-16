@@ -99,8 +99,8 @@ namespace ChatServer.lib
         public static void SaveMessage(string message, string roomName, ref MySqlConnection connection)
         {
             MySqlCommand query = connection.CreateCommand();
-            query.CommandText = "insert into `" + roomName + "_hist`(message, dt) values('" + MySqlHelper.EscapeString(message) + 
-                "', sysdate()); commit;";
+            query.CommandText = "insert into `" + MySqlHelper.EscapeString(roomName) + "_hist`(message, dt) values('" 
+                + MySqlHelper.EscapeString(message) + "', sysdate()); commit;";
             query.ExecuteNonQuery();
         }
         /// <summary>
@@ -114,7 +114,7 @@ namespace ChatServer.lib
             List<string> hist = new List<string>();
             MySqlCommand query = connection.CreateCommand();
             query.CommandText = "select concat(date_format(dt, '%H:%i:%s'),'  ||  ', message) from `" 
-                + roomName + "_hist` order by id;";
+                + MySqlHelper.EscapeString(roomName) + "_hist` order by id;";
             MySqlDataReader selection = query.ExecuteReader();
             while (selection.Read())
                 hist.Add(selection.GetString(0));

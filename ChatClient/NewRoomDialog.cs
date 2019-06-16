@@ -14,7 +14,6 @@ namespace ChatClient
             this.client = client;
             Text = title;
         }
-
         private void TryToCreateRoom(object sender, EventArgs e)
         {
             string toSend = roomName.Text.Trim(' ');
@@ -24,7 +23,6 @@ namespace ChatClient
                 Close();
             }
         }
-
         private void roomName_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter)
@@ -32,6 +30,10 @@ namespace ChatClient
                 TryToCreateRoom(sender, e);
                 e.Handled = true;
             }
+        }
+        private void BanQuotes(object sender, EventArgs e)
+        {
+            roomName.Text = roomName.Text.Trim('`');
         }
     }
 }

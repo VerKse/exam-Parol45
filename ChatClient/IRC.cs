@@ -155,7 +155,7 @@ namespace ChatClient
             }
             catch (Exception e)
             {
-                PrintToMessageBox("In GetNewMessages(): " + e.Message);
+                //PrintToMessageBox("In GetNewMessages(): " + e.Message);
                 Disconnect();
                 PrintToMessageBox("Disconnected from server");
                 inputTextBox.Enabled = false;
@@ -337,7 +337,7 @@ namespace ChatClient
             base.OnShown(e);
             ActiveControl = null;
         }
-        private void OnRecize(object sender, EventArgs e)
+        private void OnSizeChanged(object sender, EventArgs e)
         {
             messageBox.SelectionStart = messageBox.Text.Length - 1;
             messageBox.ScrollToCaret();

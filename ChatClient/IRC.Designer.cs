@@ -34,6 +34,7 @@
             this.chatroomList = new System.Windows.Forms.ListBox();
             this.chatroomsLabel = new System.Windows.Forms.TextBox();
             this.TableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.inputTextBox = new System.Windows.Forms.RichTextBox();
             this.userlistLayout = new System.Windows.Forms.TableLayoutPanel();
             this.onlineUsersLabel = new System.Windows.Forms.TextBox();
@@ -50,8 +51,6 @@
             this.themeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.darkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.messageBox = new ChatClient.lib.RichTextBoxEx();
             this.tableLayoutPanel1.SuspendLayout();
             this.mainTableLayout.SuspendLayout();
             this.chatroomLayout.SuspendLayout();
@@ -152,6 +151,19 @@
             this.TableLayout.Size = new System.Drawing.Size(381, 305);
             this.TableLayout.TabIndex = 0;
             // 
+            // messageBox
+            // 
+            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.messageBox.Location = new System.Drawing.Point(5, 5);
+            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
+            this.messageBox.Name = "messageBox";
+            this.messageBox.ReadOnly = true;
+            this.messageBox.Size = new System.Drawing.Size(371, 264);
+            this.messageBox.TabIndex = 6;
+            this.messageBox.TabStop = false;
+            this.messageBox.Text = "";
+            this.messageBox.MouseHover += new System.EventHandler(this.messageBox_MouseHover);
+            // 
             // inputTextBox
             // 
             this.inputTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -211,8 +223,7 @@
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.roomsToolStripMenuItem,
-            this.settingsToolStripMenuItem,
-            this.helpToolStripMenuItem});
+            this.settingsToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(584, 24);
@@ -230,14 +241,14 @@
             // reconnectToolStripMenuItem
             // 
             this.reconnectToolStripMenuItem.Name = "reconnectToolStripMenuItem";
-            this.reconnectToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.reconnectToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.reconnectToolStripMenuItem.Text = "Reconnect";
             this.reconnectToolStripMenuItem.Click += new System.EventHandler(this.ToolStripReconnectClick);
             // 
             // disconnectToolStripMenuItem
             // 
             this.disconnectToolStripMenuItem.Name = "disconnectToolStripMenuItem";
-            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.disconnectToolStripMenuItem.Text = "Disconnect";
             this.disconnectToolStripMenuItem.Click += new System.EventHandler(this.ToolStripDisconnectClick);
             // 
@@ -254,21 +265,21 @@
             // addToolStripMenuItem
             // 
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.addToolStripMenuItem.Text = "Add";
             this.addToolStripMenuItem.Click += new System.EventHandler(this.ToolStripAddRoomClick);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.ToolStripDeleteClick);
             // 
             // leaveToolStripMenuItem
             // 
             this.leaveToolStripMenuItem.Name = "leaveToolStripMenuItem";
-            this.leaveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.leaveToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.leaveToolStripMenuItem.Text = "Leave";
             this.leaveToolStripMenuItem.Click += new System.EventHandler(this.ToolStripLeaveClick);
             // 
@@ -303,25 +314,6 @@
             this.darkToolStripMenuItem.Text = "Dark";
             this.darkToolStripMenuItem.Click += new System.EventHandler(this.setDarkTheme);
             // 
-            // helpToolStripMenuItem
-            // 
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.helpToolStripMenuItem.Text = "Help";
-            // 
-            // messageBox
-            // 
-            this.messageBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.messageBox.Location = new System.Drawing.Point(5, 5);
-            this.messageBox.Margin = new System.Windows.Forms.Padding(5);
-            this.messageBox.Name = "messageBox";
-            this.messageBox.ReadOnly = true;
-            this.messageBox.Size = new System.Drawing.Size(371, 264);
-            this.messageBox.TabIndex = 6;
-            this.messageBox.TabStop = false;
-            this.messageBox.Text = "";
-            this.messageBox.MouseHover += new System.EventHandler(this.messageBox_MouseHover);
-            // 
             // IRC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -335,7 +327,7 @@
             this.Text = "IRC";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.IRC_FormClosing);
             this.Load += new System.EventHandler(this.onIrcLoad);
-            this.SizeChanged += new System.EventHandler(this.OnRecize);
+            this.SizeChanged += new System.EventHandler(this.OnSizeChanged);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.mainTableLayout.ResumeLayout(false);
@@ -371,7 +363,6 @@
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem leaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reconnectToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem themeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem lightToolStripMenuItem;

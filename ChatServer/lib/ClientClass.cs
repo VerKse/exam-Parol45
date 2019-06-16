@@ -40,6 +40,20 @@ namespace ChatServer.lib
                         case codes.REQUESTING_ROOMLIST:
                             SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection)), ref client);
                             break;
+                        case codes.SENDING_USERNAME:
+                            if (ServerEngine.existingNicknames.FirstOrDefault(n => n == message.info) == null)
+                            {
+                                name = message.info;
+                                ServerEngine.existingNicknames.Add(name);
+                                SendToStream(new Message(codes.CONFIRMING_USERNAME, name), ref client);
+                                Console.WriteLine("User " + name + " logged in.");
+                            }
+                            else
+                            {
+                                SendToStream(new Message(codes.REQUESTING_USERNAME,
+                                    "There is user witn nickname \"" + message.info + "\" already"), ref client);
+                            }
+                            break;
                         case codes.REQUESTING_CHAT_HIST:
                             SendToStream(new Message(codes.SENDING_CHAT_HIST, list: DBmanager.GetHistory(name, connection)), ref client);
                             break;
@@ -91,10 +105,6 @@ namespace ChatServer.lib
             catch (Exception e)
             {
                 Console.WriteLine("In Process(): " + e.Message);
-                if (room != null)
-                    Console.WriteLine(name + " left the room.");
-                else
-                    Console.WriteLine(name + " disconnected.");
                 Disconnect();
             }
         }
@@ -106,7 +116,8 @@ namespace ChatServer.lib
             if (client != null)
                 client.Close();
             connection.Close();
-            ServerEngine.existingNicknames.Remove(name);
+            if (name != null)
+                ServerEngine.existingNicknames.Remove(name);
             if (room != null)
                 room.RemoveClient(id);
             else

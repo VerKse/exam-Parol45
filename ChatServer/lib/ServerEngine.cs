@@ -34,7 +34,7 @@ namespace ChatServer.lib
                     Console.WriteLine("Waiting for connections...");
                     TcpClient client = listener.AcceptTcpClient();
                     Console.WriteLine("Somebody connected.");
-                    Task.Run(() => LogIn(ref client));
+                    Task.Run(() => CreateUser(ref client));
                 }
             }
             catch (Exception e)
@@ -46,65 +46,12 @@ namespace ChatServer.lib
         /// Начальная обработка пользователя после подключения
         /// </summary>
         /// <param name="client"></param>
-        private static void LogIn(ref TcpClient client)
+        private static void CreateUser(ref TcpClient client)
         {
-            Message message;
-            bool served = false;
             MySqlConnection connection = DBmanager.Connect();
             ClientClass clientObj = new ClientClass(ref connection, ref client, null, idForNextUser++);
             unassignedUsers.Add(clientObj);
-            try
-            {
-                while (!served)
-                {
-                    message = GetFromStream(ref client);
-                    switch (message.code)
-                    {
-                        case codes.REQUESTING_ROOMLIST:
-                            SendToStream(new Message(codes.SENDING_ROOMLIST, list: DBmanager.GetRoomList(connection))
-                                , ref client);
-                            break;
-                        case codes.SENDING_USERNAME:
-                            if (existingNicknames.FirstOrDefault(n => n == message.info) == null)
-                            {
-                                clientObj.name = message.info;
-                                existingNicknames.Add(clientObj.name);
-                                SendToStream(new Message(codes.CONFIRMING_USERNAME, clientObj.name), ref client);
-                                Console.WriteLine("User " + clientObj.name + " logged in.");
-                            }
-                            else
-                            {
-                                SendToStream(new Message(codes.REQUESTING_USERNAME,
-                                    "There is user witn nickname \"" + message.info + "\" already"), ref client);
-                            }
-                            break;
-                        case codes.SENDING_SELECTED_ROOM:
-                            unassignedUsers.Remove(clientObj);
-                            rooms.FirstOrDefault(r => r.name == message.info).AddClient(clientObj);
-                            Task.Run(() => clientObj.Process());
-                            served = true;
-                            break;
-                        case codes.REQUESTING_NEW_ROOM:
-                            AddRoom(ref connection, ref client, message.info);
-                            break;
-                        case codes.SENDING_DISCONNECT_MESSAGE:
-                            throw new Exception("Disconnected");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("In LogIn(): " + e.Message);
-                unassignedUsers.Remove(clientObj);
-                if (clientObj.client != null)
-                {
-                    clientObj.client.GetStream().Close();
-                    clientObj.client.Close();
-                }
-                Console.WriteLine((clientObj.name == null ? "Anon" : clientObj.name) + " disconnected");
-                if (clientObj.name != null)
-                    existingNicknames.Remove(clientObj.name);
-            }
+            Task.Run(() => clientObj.Process());
         }
         /// <summary>
         /// Смена комнаты пользователя

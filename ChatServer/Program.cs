@@ -11,7 +11,7 @@ namespace ChatServer
         // TODO: переписать под эвенты.
         static void Main(string[] args)
         {
-            Console.WriteLine("ver 0.3.6");
+            Console.WriteLine("ver 0.4.0");
             // Создаём возможно отсутствующие объекты в бд.
             DBmanager.Initialize();
             // Ждём пользователей в бесконечном цикле.
